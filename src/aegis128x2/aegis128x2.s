@@ -1,10 +1,10 @@
 	.att_syntax
 	.text
 	.p2align	5
-	.globl	__aegis128x2_decrypt
-	.globl	_aegis128x2_decrypt
-	.globl	__aegis128x2_encrypt
-	.globl	_aegis128x2_encrypt
+	.global	__aegis128x2_decrypt
+	.global	_aegis128x2_decrypt
+	.global	__aegis128x2_encrypt
+	.global	_aegis128x2_encrypt
 __aegis128x2_decrypt:
 _aegis128x2_decrypt:
 	movq	%rsp, %r11
@@ -167,7 +167,7 @@ _aegis128x2_decrypt:
 	vaesenc	%ymm11, %ymm9, %ymm9
 	movq	168(%rsp), %rdi
 	andq	$-64, %rdi
-	xorq	%r9, %r9
+	xorl	%r9d, %r9d
 	jmp 	L_aegis128x2_decrypt$15
 	.p2align	5
 L_aegis128x2_decrypt$16:
@@ -196,7 +196,7 @@ L_aegis128x2_decrypt$15:
 	vpxor	%ymm7, %ymm7, %ymm7
 	vmovdqu	%ymm7, 32(%rsp)
 	vmovdqu	%ymm7, 64(%rsp)
-	xorq	%r9, %r9
+	xorl	%r9d, %r9d
 	jmp 	L_aegis128x2_decrypt$13
 L_aegis128x2_decrypt$14:
 	movb	(%r8,%r9), %r10b
@@ -221,7 +221,7 @@ L_aegis128x2_decrypt$13:
 L_aegis128x2_decrypt$12:
 	movq	160(%rsp), %rdi
 	andq	$-64, %rdi
-	xorq	%r8, %r8
+	xorl	%r8d, %r8d
 	jmp 	L_aegis128x2_decrypt$10
 	.p2align	5
 L_aegis128x2_decrypt$11:
@@ -261,7 +261,7 @@ L_aegis128x2_decrypt$10:
 	vpxor	%ymm7, %ymm7, %ymm7
 	vmovdqu	%ymm7, 32(%rsp)
 	vmovdqu	%ymm7, 64(%rsp)
-	xorq	%r8, %r8
+	xorl	%r8d, %r8d
 	jmp 	L_aegis128x2_decrypt$8
 L_aegis128x2_decrypt$9:
 	movb	(%rax,%r8), %r9b
@@ -305,7 +305,7 @@ L_aegis128x2_decrypt$6:
 	vaesenc	%ymm10, %ymm12, %ymm9
 	vmovdqu	%ymm8, 32(%rsp)
 	vmovdqu	%ymm7, 64(%rsp)
-	xorq	%rax, %rax
+	xorl	%eax, %eax
 	jmp 	L_aegis128x2_decrypt$4
 L_aegis128x2_decrypt$5:
 	movb	32(%rsp,%rax), %r8b
@@ -317,7 +317,6 @@ L_aegis128x2_decrypt$4:
 L_aegis128x2_decrypt$3:
 	movq	168(%rsp), %rax
 	movq	160(%rsp), %rsi
-	xorq	%rdi, %rdi
 	shlq	$3, %rax
 	shlq	$3, %rsi
 	movq	%rax, (%rsp)
@@ -419,10 +418,10 @@ L_aegis128x2_decrypt$3:
 	vpcmpeqq	%xmm1, %xmm2, %xmm1
 	vpcmpeqq	%xmm0, %xmm3, %xmm0
 	vpand	%xmm0, %xmm1, %xmm0
-	vpmovmskb	%xmm0, %rax
+	vpmovmskb	%xmm0, %eax
 	incq	%rax
 	shrq	$16, %rax
-	addq	$-1, %rax
+	decq	%rax
 	jmp 	L_aegis128x2_decrypt$2
 L_aegis128x2_decrypt$1:
 	vpxor	%ymm5, %ymm6, %ymm0
@@ -435,10 +434,10 @@ L_aegis128x2_decrypt$1:
 	vpxor	%xmm0, %xmm1, %xmm0
 	vmovdqu	(%rcx), %xmm1
 	vpcmpeqq	%xmm0, %xmm1, %xmm0
-	vpmovmskb	%xmm0, %rax
+	vpmovmskb	%xmm0, %eax
 	incq	%rax
 	shrq	$16, %rax
-	addq	$-1, %rax
+	decq	%rax
 L_aegis128x2_decrypt$2:
 	movq	%r11, %rsp
 	movq	%rsp, %rsi
@@ -589,54 +588,54 @@ _aegis128x2_encrypt:
 	vaesenc	%ymm4, %ymm5, %ymm4
 	vaesenc	%ymm11, %ymm9, %ymm5
 	vpxor	%ymm1, %ymm8, %ymm11
-	vaesenc	%ymm9, %ymm6, %ymm12
+	vaesenc	%ymm9, %ymm6, %ymm9
 	vaesenc	%ymm6, %ymm7, %ymm6
 	vaesenc	%ymm7, %ymm8, %ymm7
-	vaesenc	%ymm11, %ymm10, %ymm9
-	vpxor	glob_data + 0(%rip), %ymm12, %ymm10
+	vaesenc	%ymm11, %ymm10, %ymm10
+	vpxor	glob_data + 0(%rip), %ymm9, %ymm9
 	vpxor	glob_data + 0(%rip), %ymm2, %ymm2
 	vmovdqu	%ymm2, %ymm11
-	vpxor	%ymm0, %ymm5, %ymm12
+	vpxor	%ymm0, %ymm5, %ymm8
 	vaesenc	%ymm2, %ymm3, %ymm2
-	vaesenc	%ymm3, %ymm4, %ymm8
+	vaesenc	%ymm3, %ymm4, %ymm3
 	vaesenc	%ymm4, %ymm5, %ymm4
-	vaesenc	%ymm12, %ymm10, %ymm5
-	vpxor	%ymm1, %ymm9, %ymm3
-	vaesenc	%ymm10, %ymm6, %ymm10
-	vaesenc	%ymm6, %ymm7, %ymm6
-	vaesenc	%ymm7, %ymm9, %ymm7
-	vaesenc	%ymm3, %ymm11, %ymm9
-	vpxor	glob_data + 0(%rip), %ymm10, %ymm11
+	vaesenc	%ymm8, %ymm9, %ymm8
+	vpxor	%ymm1, %ymm10, %ymm5
+	vaesenc	%ymm9, %ymm6, %ymm12
+	vaesenc	%ymm6, %ymm7, %ymm9
+	vaesenc	%ymm7, %ymm10, %ymm7
+	vaesenc	%ymm5, %ymm11, %ymm10
+	vpxor	glob_data + 0(%rip), %ymm12, %ymm12
 	vpxor	glob_data + 0(%rip), %ymm2, %ymm2
-	vmovdqu	%ymm2, %ymm10
-	vpxor	%ymm0, %ymm5, %ymm12
-	vaesenc	%ymm2, %ymm8, %ymm3
-	vaesenc	%ymm8, %ymm4, %ymm2
-	vaesenc	%ymm4, %ymm5, %ymm0
-	vaesenc	%ymm12, %ymm11, %ymm4
-	vpxor	%ymm1, %ymm9, %ymm8
-	vaesenc	%ymm11, %ymm6, %ymm1
-	vaesenc	%ymm6, %ymm7, %ymm5
-	vaesenc	%ymm7, %ymm9, %ymm6
-	vaesenc	%ymm8, %ymm10, %ymm9
+	vmovdqu	%ymm2, %ymm11
+	vpxor	%ymm0, %ymm8, %ymm0
+	vaesenc	%ymm2, %ymm3, %ymm6
+	vaesenc	%ymm3, %ymm4, %ymm5
+	vaesenc	%ymm4, %ymm8, %ymm4
+	vaesenc	%ymm0, %ymm12, %ymm3
+	vpxor	%ymm1, %ymm10, %ymm8
+	vaesenc	%ymm12, %ymm9, %ymm2
+	vaesenc	%ymm9, %ymm7, %ymm1
+	vaesenc	%ymm7, %ymm10, %ymm0
+	vaesenc	%ymm8, %ymm11, %ymm9
 	movq	104(%rsp), %rdi
 	andq	$-64, %rdi
-	xorq	%r9, %r9
+	xorl	%r9d, %r9d
 	jmp 	L_aegis128x2_encrypt$13
 	.p2align	5
 L_aegis128x2_encrypt$14:
 	vmovdqu	(%r8,%r9), %ymm7
 	vmovdqu	32(%r8,%r9), %ymm8
-	vmovdqu	%ymm3, %ymm10
-	vpxor	%ymm8, %ymm4, %ymm8
-	vaesenc	%ymm3, %ymm2, %ymm3
-	vaesenc	%ymm2, %ymm0, %ymm2
-	vaesenc	%ymm0, %ymm4, %ymm0
-	vaesenc	%ymm8, %ymm1, %ymm4
+	vmovdqu	%ymm6, %ymm10
+	vpxor	%ymm8, %ymm3, %ymm8
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm4, %ymm5
+	vaesenc	%ymm4, %ymm3, %ymm4
+	vaesenc	%ymm8, %ymm2, %ymm3
 	vpxor	%ymm7, %ymm9, %ymm7
-	vaesenc	%ymm1, %ymm5, %ymm1
-	vaesenc	%ymm5, %ymm6, %ymm5
-	vaesenc	%ymm6, %ymm9, %ymm6
+	vaesenc	%ymm2, %ymm1, %ymm2
+	vaesenc	%ymm1, %ymm0, %ymm1
+	vaesenc	%ymm0, %ymm9, %ymm0
 	vaesenc	%ymm7, %ymm10, %ymm9
 	addq	$64, %r9
 L_aegis128x2_encrypt$13:
@@ -650,7 +649,7 @@ L_aegis128x2_encrypt$13:
 	vpxor	%ymm7, %ymm7, %ymm7
 	vmovdqu	%ymm7, 32(%rsp)
 	vmovdqu	%ymm7, 64(%rsp)
-	xorq	%r9, %r9
+	xorl	%r9d, %r9d
 	jmp 	L_aegis128x2_encrypt$11
 L_aegis128x2_encrypt$12:
 	movb	(%r8,%r9), %r10b
@@ -661,44 +660,44 @@ L_aegis128x2_encrypt$11:
 	jb  	L_aegis128x2_encrypt$12
 	vmovdqu	32(%rsp), %ymm7
 	vmovdqu	64(%rsp), %ymm8
-	vmovdqu	%ymm3, %ymm10
-	vpxor	%ymm8, %ymm4, %ymm8
-	vaesenc	%ymm3, %ymm2, %ymm3
-	vaesenc	%ymm2, %ymm0, %ymm2
-	vaesenc	%ymm0, %ymm4, %ymm0
-	vaesenc	%ymm8, %ymm1, %ymm4
+	vmovdqu	%ymm6, %ymm10
+	vpxor	%ymm8, %ymm3, %ymm8
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm4, %ymm5
+	vaesenc	%ymm4, %ymm3, %ymm4
+	vaesenc	%ymm8, %ymm2, %ymm3
 	vpxor	%ymm7, %ymm9, %ymm7
-	vaesenc	%ymm1, %ymm5, %ymm1
-	vaesenc	%ymm5, %ymm6, %ymm5
-	vaesenc	%ymm6, %ymm9, %ymm6
+	vaesenc	%ymm2, %ymm1, %ymm2
+	vaesenc	%ymm1, %ymm0, %ymm1
+	vaesenc	%ymm0, %ymm9, %ymm0
 	vaesenc	%ymm7, %ymm10, %ymm9
 L_aegis128x2_encrypt$10:
 	movq	96(%rsp), %rdi
 	andq	$-64, %rdi
-	xorq	%r8, %r8
+	xorl	%r8d, %r8d
 	jmp 	L_aegis128x2_encrypt$8
 	.p2align	5
 L_aegis128x2_encrypt$9:
 	vmovdqu	(%rsi,%r8), %ymm7
 	vmovdqu	32(%rsi,%r8), %ymm8
-	vpand	%ymm1, %ymm5, %ymm10
-	vpand	%ymm3, %ymm2, %ymm11
-	vpxor	%ymm6, %ymm2, %ymm12
-	vpxor	%ymm0, %ymm5, %ymm13
+	vpand	%ymm2, %ymm1, %ymm10
+	vpand	%ymm6, %ymm5, %ymm11
+	vpxor	%ymm0, %ymm5, %ymm12
+	vpxor	%ymm4, %ymm1, %ymm13
 	vpxor	%ymm10, %ymm12, %ymm10
 	vpxor	%ymm11, %ymm13, %ymm11
 	vpxor	%ymm10, %ymm7, %ymm10
 	vpxor	%ymm11, %ymm8, %ymm11
-	vmovdqu	%ymm3, %ymm12
-	vpxor	%ymm8, %ymm4, %ymm8
-	vaesenc	%ymm3, %ymm2, %ymm3
-	vaesenc	%ymm2, %ymm0, %ymm2
-	vaesenc	%ymm0, %ymm4, %ymm0
-	vaesenc	%ymm8, %ymm1, %ymm4
+	vmovdqu	%ymm6, %ymm12
+	vpxor	%ymm8, %ymm3, %ymm8
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm4, %ymm5
+	vaesenc	%ymm4, %ymm3, %ymm4
+	vaesenc	%ymm8, %ymm2, %ymm3
 	vpxor	%ymm7, %ymm9, %ymm7
-	vaesenc	%ymm1, %ymm5, %ymm1
-	vaesenc	%ymm5, %ymm6, %ymm5
-	vaesenc	%ymm6, %ymm9, %ymm6
+	vaesenc	%ymm2, %ymm1, %ymm2
+	vaesenc	%ymm1, %ymm0, %ymm1
+	vaesenc	%ymm0, %ymm9, %ymm0
 	vaesenc	%ymm7, %ymm12, %ymm9
 	vmovdqu	%ymm10, (%rax,%r8)
 	vmovdqu	%ymm11, 32(%rax,%r8)
@@ -715,7 +714,7 @@ L_aegis128x2_encrypt$8:
 	vpxor	%ymm7, %ymm7, %ymm7
 	vmovdqu	%ymm7, 32(%rsp)
 	vmovdqu	%ymm7, 64(%rsp)
-	xorq	%r8, %r8
+	xorl	%r8d, %r8d
 	jmp 	L_aegis128x2_encrypt$6
 L_aegis128x2_encrypt$7:
 	movb	(%rsi,%r8), %r9b
@@ -726,28 +725,28 @@ L_aegis128x2_encrypt$6:
 	jb  	L_aegis128x2_encrypt$7
 	vmovdqu	32(%rsp), %ymm7
 	vmovdqu	64(%rsp), %ymm8
-	vpand	%ymm1, %ymm5, %ymm10
-	vpand	%ymm3, %ymm2, %ymm11
-	vpxor	%ymm6, %ymm2, %ymm12
-	vpxor	%ymm0, %ymm5, %ymm13
+	vpand	%ymm2, %ymm1, %ymm10
+	vpand	%ymm6, %ymm5, %ymm11
+	vpxor	%ymm0, %ymm5, %ymm12
+	vpxor	%ymm4, %ymm1, %ymm13
 	vpxor	%ymm10, %ymm12, %ymm10
 	vpxor	%ymm11, %ymm13, %ymm11
 	vpxor	%ymm10, %ymm7, %ymm10
 	vpxor	%ymm11, %ymm8, %ymm11
-	vmovdqu	%ymm3, %ymm12
-	vpxor	%ymm8, %ymm4, %ymm8
-	vaesenc	%ymm3, %ymm2, %ymm3
-	vaesenc	%ymm2, %ymm0, %ymm2
-	vaesenc	%ymm0, %ymm4, %ymm0
-	vaesenc	%ymm8, %ymm1, %ymm4
+	vmovdqu	%ymm6, %ymm12
+	vpxor	%ymm8, %ymm3, %ymm8
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm4, %ymm5
+	vaesenc	%ymm4, %ymm3, %ymm4
+	vaesenc	%ymm8, %ymm2, %ymm3
 	vpxor	%ymm7, %ymm9, %ymm7
-	vaesenc	%ymm1, %ymm5, %ymm1
-	vaesenc	%ymm5, %ymm6, %ymm5
-	vaesenc	%ymm6, %ymm9, %ymm6
+	vaesenc	%ymm2, %ymm1, %ymm2
+	vaesenc	%ymm1, %ymm0, %ymm1
+	vaesenc	%ymm0, %ymm9, %ymm0
 	vaesenc	%ymm7, %ymm12, %ymm9
 	vmovdqu	%ymm10, 32(%rsp)
 	vmovdqu	%ymm11, 64(%rsp)
-	xorq	%rsi, %rsi
+	xorl	%esi, %esi
 	jmp 	L_aegis128x2_encrypt$4
 L_aegis128x2_encrypt$5:
 	movb	32(%rsp,%rsi), %r8b
@@ -759,99 +758,99 @@ L_aegis128x2_encrypt$4:
 L_aegis128x2_encrypt$3:
 	movq	104(%rsp), %rsi
 	movq	96(%rsp), %rdi
-	xorq	%rax, %rax
+	xorl	%eax, %eax
 	shlq	$3, %rsi
 	shlq	$3, %rdi
 	movq	%rsi, (%rsp)
 	movq	%rsi, 16(%rsp)
 	movq	%rdi, 8(%rsp)
 	movq	%rdi, 24(%rsp)
-	vpxor	(%rsp), %ymm5, %ymm7
-	vmovdqu	%ymm3, %ymm8
+	vpxor	(%rsp), %ymm1, %ymm7
+	vmovdqu	%ymm6, %ymm8
+	vpxor	%ymm7, %ymm3, %ymm10
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm4, %ymm5
+	vaesenc	%ymm4, %ymm3, %ymm3
+	vaesenc	%ymm10, %ymm2, %ymm4
+	vpxor	%ymm7, %ymm9, %ymm10
+	vaesenc	%ymm2, %ymm1, %ymm2
+	vaesenc	%ymm1, %ymm0, %ymm1
+	vaesenc	%ymm0, %ymm9, %ymm0
+	vaesenc	%ymm10, %ymm8, %ymm9
+	vmovdqu	%ymm6, %ymm8
 	vpxor	%ymm7, %ymm4, %ymm10
-	vaesenc	%ymm3, %ymm2, %ymm3
-	vaesenc	%ymm2, %ymm0, %ymm2
-	vaesenc	%ymm0, %ymm4, %ymm4
-	vaesenc	%ymm10, %ymm1, %ymm10
-	vpxor	%ymm7, %ymm9, %ymm11
-	vaesenc	%ymm1, %ymm5, %ymm0
-	vaesenc	%ymm5, %ymm6, %ymm1
-	vaesenc	%ymm6, %ymm9, %ymm5
-	vaesenc	%ymm11, %ymm8, %ymm9
-	vmovdqu	%ymm3, %ymm6
-	vpxor	%ymm7, %ymm10, %ymm8
-	vaesenc	%ymm3, %ymm2, %ymm3
-	vaesenc	%ymm2, %ymm4, %ymm2
-	vaesenc	%ymm4, %ymm10, %ymm4
-	vaesenc	%ymm8, %ymm0, %ymm8
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm3, %ymm5
+	vaesenc	%ymm3, %ymm4, %ymm3
+	vaesenc	%ymm10, %ymm2, %ymm4
 	vpxor	%ymm7, %ymm9, %ymm10
-	vaesenc	%ymm0, %ymm1, %ymm0
-	vaesenc	%ymm1, %ymm5, %ymm1
-	vaesenc	%ymm5, %ymm9, %ymm5
-	vaesenc	%ymm10, %ymm6, %ymm9
-	vmovdqu	%ymm3, %ymm6
-	vpxor	%ymm7, %ymm8, %ymm10
-	vaesenc	%ymm3, %ymm2, %ymm3
-	vaesenc	%ymm2, %ymm4, %ymm2
-	vaesenc	%ymm4, %ymm8, %ymm4
-	vaesenc	%ymm10, %ymm0, %ymm8
+	vaesenc	%ymm2, %ymm1, %ymm2
+	vaesenc	%ymm1, %ymm0, %ymm1
+	vaesenc	%ymm0, %ymm9, %ymm0
+	vaesenc	%ymm10, %ymm8, %ymm9
+	vmovdqu	%ymm6, %ymm8
+	vpxor	%ymm7, %ymm4, %ymm10
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm3, %ymm5
+	vaesenc	%ymm3, %ymm4, %ymm3
+	vaesenc	%ymm10, %ymm2, %ymm4
 	vpxor	%ymm7, %ymm9, %ymm10
-	vaesenc	%ymm0, %ymm1, %ymm0
-	vaesenc	%ymm1, %ymm5, %ymm1
-	vaesenc	%ymm5, %ymm9, %ymm5
-	vaesenc	%ymm10, %ymm6, %ymm9
-	vmovdqu	%ymm3, %ymm6
-	vpxor	%ymm7, %ymm8, %ymm10
-	vaesenc	%ymm3, %ymm2, %ymm3
-	vaesenc	%ymm2, %ymm4, %ymm2
-	vaesenc	%ymm4, %ymm8, %ymm4
-	vaesenc	%ymm10, %ymm0, %ymm8
+	vaesenc	%ymm2, %ymm1, %ymm2
+	vaesenc	%ymm1, %ymm0, %ymm1
+	vaesenc	%ymm0, %ymm9, %ymm0
+	vaesenc	%ymm10, %ymm8, %ymm9
+	vmovdqu	%ymm6, %ymm8
+	vpxor	%ymm7, %ymm4, %ymm10
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm3, %ymm5
+	vaesenc	%ymm3, %ymm4, %ymm3
+	vaesenc	%ymm10, %ymm2, %ymm4
 	vpxor	%ymm7, %ymm9, %ymm10
-	vaesenc	%ymm0, %ymm1, %ymm0
-	vaesenc	%ymm1, %ymm5, %ymm1
-	vaesenc	%ymm5, %ymm9, %ymm5
-	vaesenc	%ymm10, %ymm6, %ymm9
-	vmovdqu	%ymm3, %ymm6
-	vpxor	%ymm7, %ymm8, %ymm10
-	vaesenc	%ymm3, %ymm2, %ymm3
-	vaesenc	%ymm2, %ymm4, %ymm2
-	vaesenc	%ymm4, %ymm8, %ymm4
-	vaesenc	%ymm10, %ymm0, %ymm8
+	vaesenc	%ymm2, %ymm1, %ymm2
+	vaesenc	%ymm1, %ymm0, %ymm1
+	vaesenc	%ymm0, %ymm9, %ymm0
+	vaesenc	%ymm10, %ymm8, %ymm9
+	vmovdqu	%ymm6, %ymm8
+	vpxor	%ymm7, %ymm4, %ymm10
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm3, %ymm5
+	vaesenc	%ymm3, %ymm4, %ymm3
+	vaesenc	%ymm10, %ymm2, %ymm4
 	vpxor	%ymm7, %ymm9, %ymm10
-	vaesenc	%ymm0, %ymm1, %ymm0
-	vaesenc	%ymm1, %ymm5, %ymm1
-	vaesenc	%ymm5, %ymm9, %ymm5
-	vaesenc	%ymm10, %ymm6, %ymm9
-	vmovdqu	%ymm3, %ymm6
-	vpxor	%ymm7, %ymm8, %ymm10
-	vaesenc	%ymm3, %ymm2, %ymm3
-	vaesenc	%ymm2, %ymm4, %ymm2
-	vaesenc	%ymm4, %ymm8, %ymm4
-	vaesenc	%ymm10, %ymm0, %ymm8
+	vaesenc	%ymm2, %ymm1, %ymm2
+	vaesenc	%ymm1, %ymm0, %ymm1
+	vaesenc	%ymm0, %ymm9, %ymm0
+	vaesenc	%ymm10, %ymm8, %ymm9
+	vmovdqu	%ymm6, %ymm8
+	vpxor	%ymm7, %ymm4, %ymm10
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm3, %ymm5
+	vaesenc	%ymm3, %ymm4, %ymm3
+	vaesenc	%ymm10, %ymm2, %ymm4
 	vpxor	%ymm7, %ymm9, %ymm10
-	vaesenc	%ymm0, %ymm1, %ymm0
-	vaesenc	%ymm1, %ymm5, %ymm1
-	vaesenc	%ymm5, %ymm9, %ymm5
-	vaesenc	%ymm10, %ymm6, %ymm6
-	vmovdqu	%ymm3, %ymm9
-	vpxor	%ymm7, %ymm8, %ymm10
-	vaesenc	%ymm3, %ymm2, %ymm3
-	vaesenc	%ymm2, %ymm4, %ymm2
-	vaesenc	%ymm4, %ymm8, %ymm4
-	vaesenc	%ymm10, %ymm0, %ymm8
-	vpxor	%ymm7, %ymm6, %ymm7
-	vaesenc	%ymm0, %ymm1, %ymm0
-	vaesenc	%ymm1, %ymm5, %ymm1
-	vaesenc	%ymm5, %ymm6, %ymm5
-	vaesenc	%ymm7, %ymm9, %ymm6
+	vaesenc	%ymm2, %ymm1, %ymm2
+	vaesenc	%ymm1, %ymm0, %ymm1
+	vaesenc	%ymm0, %ymm9, %ymm0
+	vaesenc	%ymm10, %ymm8, %ymm8
+	vmovdqu	%ymm6, %ymm9
+	vpxor	%ymm7, %ymm4, %ymm10
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm3, %ymm5
+	vaesenc	%ymm3, %ymm4, %ymm3
+	vaesenc	%ymm10, %ymm2, %ymm4
+	vpxor	%ymm7, %ymm8, %ymm7
+	vaesenc	%ymm2, %ymm1, %ymm2
+	vaesenc	%ymm1, %ymm0, %ymm1
+	vaesenc	%ymm0, %ymm8, %ymm0
+	vaesenc	%ymm7, %ymm9, %ymm7
 	cmpb	$16, %dl
 	je  	L_aegis128x2_encrypt$1
-	vpxor	%ymm5, %ymm6, %ymm5
-	vpxor	%ymm4, %ymm8, %ymm4
-	vpxor	%ymm1, %ymm5, %ymm1
-	vpxor	%ymm2, %ymm4, %ymm2
-	vpxor	%ymm0, %ymm1, %ymm0
-	vpxor	%ymm3, %ymm2, %ymm1
+	vpxor	%ymm0, %ymm7, %ymm0
+	vpxor	%ymm3, %ymm4, %ymm3
+	vpxor	%ymm1, %ymm0, %ymm0
+	vpxor	%ymm5, %ymm3, %ymm1
+	vpxor	%ymm2, %ymm0, %ymm0
+	vpxor	%ymm6, %ymm1, %ymm1
 	vextracti128	$1, %ymm0, %xmm2
 	vextracti128	$1, %ymm1, %xmm3
 	vpxor	%xmm0, %xmm2, %xmm0
@@ -860,12 +859,12 @@ L_aegis128x2_encrypt$3:
 	vmovdqu	%xmm1, 16(%rcx)
 	jmp 	L_aegis128x2_encrypt$2
 L_aegis128x2_encrypt$1:
-	vpxor	%ymm5, %ymm6, %ymm3
-	vpxor	%ymm1, %ymm3, %ymm1
-	vpxor	%ymm0, %ymm1, %ymm0
-	vpxor	%ymm8, %ymm0, %ymm0
-	vpxor	%ymm4, %ymm0, %ymm0
+	vpxor	%ymm0, %ymm7, %ymm0
+	vpxor	%ymm1, %ymm0, %ymm0
 	vpxor	%ymm2, %ymm0, %ymm0
+	vpxor	%ymm4, %ymm0, %ymm0
+	vpxor	%ymm3, %ymm0, %ymm0
+	vpxor	%ymm5, %ymm0, %ymm0
 	vextracti128	$1, %ymm0, %xmm1
 	vpxor	%xmm0, %xmm1, %xmm0
 	vmovdqu	%xmm0, (%rcx)
