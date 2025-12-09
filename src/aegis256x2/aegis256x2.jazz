@@ -83,7 +83,7 @@ inline fn declast(#secret reg u256[6] st, #public reg u256 t,
     pad[0] = out;
     reg u64 i = left;
     while (i < 32) {
-        pad[u8(int) i] = 0;
+        pad[:u8 i] = 0;
         i += 1;
     }
     st = update2(st, pad[0], st5);
@@ -107,10 +107,10 @@ inline fn init(#public reg u64 key_p, #public reg u64 nonce_p)
     #secret reg u128 k00 k10;
     #public reg u128 n00 n10;
 
-    k00 = (u128)[key_p];
-    k10 = (u128)[key_p + 16];
-    #declassify n00 = (u128)[nonce_p];
-    #declassify n10 = (u128)[nonce_p + 16];
+    k00 = [:u128 key_p];
+    k10 = [:u128 key_p + 16];
+    #declassify n00 = [:u128 nonce_p];
+    #declassify n10 = [:u128 nonce_p + 16];
     #secret reg u256 k0 k1;
     #public reg u256 n0 n1;
     k0 = #VINSERTI128(k0, k00, 0);
@@ -161,7 +161,8 @@ inline fn finalize(#secret reg u256[6] st,
                    #public inline bool verify)
     -> #secret reg u64
 {
-    reg u64 ret = #set0();
+    reg u64 ret;
+    ?{}, ret = #set0();
 
     stack u64[4] sizes;
     ad_len <<= 3;
@@ -170,7 +171,7 @@ inline fn finalize(#secret reg u256[6] st,
     sizes[2] = ad_len;
     sizes[1] = msg_len;
     sizes[3] = msg_len;
-    reg u256 t = st[3] ^ sizes[u256 0];
+    reg u256 t = st[3] ^ sizes[:u256 0];
 
     inline int i;
     for i = 0 to 7 {
@@ -191,14 +192,14 @@ inline fn finalize(#secret reg u256[6] st,
 
         if (verify) {
             reg u128 valid;
-            valid = (u128)[tag_p];
+            valid = [:u128 tag_p];
             valid = #VPCMPEQ_2u64(valid, tag);
-            ret = #VPMOVMSKB_u128u64(valid);
+            ret = (64u)#MOVEMASK_16u8(valid);
             ret += 1;
             ret >>= 16;
             ret -= 1;
         } else {
-            (u128)[tag_p] = tag;
+            [:u128 tag_p] = tag;
         }
     } else {
         reg u256[2] tag256;
@@ -215,18 +216,18 @@ inline fn finalize(#secret reg u256[6] st,
 
         if (verify) {
             reg u128[2] valid;
-            valid[0] = (u128)[tag_p];
-            valid[1] = (u128)[tag_p + 16];
+            valid[0] = [:u128 tag_p];
+            valid[1] = [:u128 tag_p + 16];
             valid[0] = #VPCMPEQ_2u64(valid[0], tag[0]);
             valid[1] = #VPCMPEQ_2u64(valid[1], tag[1]);
             valid[0] &= valid[1];
-            ret = #VPMOVMSKB_u128u64(valid[0]);
+            ret = (64u)#MOVEMASK_16u8(valid[0]);
             ret += 1;
             ret >>= 16;
             ret -= 1;
         } else {
-            (u128)[tag_p] = tag[0];
-            (u128)[tag_p + 16] = tag[1];
+            [:u128 tag_p] = tag[0];
+            [:u128 tag_p + 16] = tag[1];
         }
     }
     for i = 0 to 6 {
@@ -242,16 +243,16 @@ export fn _aegis256x2_encrypt(#public reg u64 params)
     #public stack u64 ad_len_ msg_len_;
     #public reg u8 tag_len;
 
-    #declassify ct_p = (u64)[params + 8 * 0];
-    // ignored: ct_len = (u64)[params + 8 * 1];
-    #declassify tag_p = (u64)[params + 8 * 2];
-    #declassify tag_len = (u8)[params + 8 * 3];
-    #declassify msg_p = (u64)[params + 8 * 4];
-    #declassify msg_len_ = (u64)[params + 8 * 5];
-    #declassify ad_p = (u64)[params + 8 * 6];
-    #declassify ad_len_ = (u64)[params + 8 * 7];
-    #declassify key_p = (u64)[params + 8 * 8];
-    #declassify nonce_p = (u64)[params + 8 * 9];
+    #declassify ct_p = [:u64 params + 8 * 0];
+    // ignored: ct_len = [:u64 :u64 params + 8 * 1];
+    #declassify tag_p = [:u64 params + 8 * 2];
+    #declassify tag_len = [:u8 params + 8 * 3];
+    #declassify msg_p = [:u64 params + 8 * 4];
+    #declassify msg_len_ = [:u64 params + 8 * 5];
+    #declassify ad_p = [:u64 params + 8 * 6];
+    #declassify ad_len_ = [:u64 params + 8 * 7];
+    #declassify key_p = [:u64 params + 8 * 8];
+    #declassify nonce_p = [:u64 params + 8 * 9];
 
     #secret reg u256[6] st;
     st = init(key_p, nonce_p);
@@ -262,10 +263,11 @@ export fn _aegis256x2_encrypt(#public reg u64 params)
     full_blocks = ad_len_;
     full_blocks = full_blocks & -32;
 
-    reg u64 i = #set0();
+    reg u64 i;
+    ?{}, i = #set0();
 
     #align while (i < full_blocks) {
-        st = absorb(st, (u256)[ad_p + i]);
+        st = absorb(st, [:u256 ad_p + i]);
         i += 32;
     }
     reg u64 left;
@@ -279,9 +281,9 @@ export fn _aegis256x2_encrypt(#public reg u64 params)
         reg u256 zero = #set0_256();
         pad[0] = zero;
 
-        i = #set0();
+        ?{}, i = #set0();
         while (i < left) {
-            pad[u8(int) i] = (u8)[ad_p + i];
+            pad[:u8 i] = [:u8 ad_p + i];
             i += 1;
         }
         st = absorb(st, pad[0]);
@@ -292,16 +294,16 @@ export fn _aegis256x2_encrypt(#public reg u64 params)
     full_blocks = msg_len_;
     full_blocks = full_blocks & -64;
 
-    i = #set0();
+    ?{}, i = #set0();
     #align while (i < full_blocks) {
-        st, (u256)[ct_p + i] = enc(st, (u256)[msg_p + i]);
-        st, (u256)[ct_p + i + 32] = enc(st, (u256)[msg_p + i + 32]);
+        st, [:u256 ct_p + i] = enc(st, [:u256 msg_p + i]);
+        st, [:u256 ct_p + i + 32] = enc(st, [:u256 msg_p + i + 32]);
         i += 64;
     }
     left = msg_len_;
     left -= i;
     if (left >= 32) {
-        st, (u256)[ct_p + i] = enc(st, (u256)[msg_p + i]);
+        st, [:u256 ct_p + i] = enc(st, [:u256 msg_p + i]);
         left -= 32;
         i += 32;
     }
@@ -313,17 +315,17 @@ export fn _aegis256x2_encrypt(#public reg u64 params)
         reg u256 zero = #set0_256();
         pad[0] = zero;
 
-        i = #set0();
+        ?{}, i = #set0();
         while (i < left) {
-            pad[u8(int) i] = (u8)[msg_p + i];
+            pad[:u8 i] = [:u8 msg_p + i];
             i += 1;
         }
 
         st, pad[0] = enc(st, pad[0]);
 
-        i = #set0();
+        ?{}, i = #set0();
         while (i < left) {
-            (u8)[ct_p + i] = pad[u8(int) i];
+            [:u8 ct_p + i] = pad[:u8 i];
             i += 1;
         }
     }
@@ -342,16 +344,16 @@ export fn _aegis256x2_decrypt(#public reg u64 params)
     #public stack u64 ad_len_ ct_len_;
     #public reg u8 tag_len;
 
-    #declassify ct_p = (u64)[params + 8 * 0];
-    #declassify ct_len_ = (u64)[params + 8 * 1];
-    #declassify tag_p = (u64)[params + 8 * 2];
-    #declassify tag_len = (u8)[params + 8 * 3];
-    #declassify msg_p = (u64)[params + 8 * 4];
-    // ignored: msg_len_ = (u64)[params + 8 * 5];
-    #declassify ad_p = (u64)[params + 8 * 6];
-    #declassify ad_len_ = (u64)[params + 8 * 7];
-    #declassify key_p = (u64)[params + 8 * 8];
-    #declassify nonce_p = (u64)[params + 8 * 9];
+    #declassify ct_p = [:u64 params + 8 * 0];
+    #declassify ct_len_ = [:u64 params + 8 * 1];
+    #declassify tag_p = [:u64 params + 8 * 2];
+    #declassify tag_len = [:u8 params + 8 * 3];
+    #declassify msg_p = [:u64 params + 8 * 4];
+    // ignored: msg_len_ = [:u64 params + 8 * 5];
+    #declassify ad_p = [:u64 params + 8 * 6];
+    #declassify ad_len_ = [:u64 params + 8 * 7];
+    #declassify key_p = [:u64 params + 8 * 8];
+    #declassify nonce_p = [:u64 params + 8 * 9];
 
     #secret reg u256[6] st;
     st = init(key_p, nonce_p);
@@ -362,9 +364,10 @@ export fn _aegis256x2_decrypt(#public reg u64 params)
     full_blocks = ad_len_;
     full_blocks = full_blocks & -32;
 
-    reg u64 i = #set0();
+    reg u64 i;
+    ?{}, i = #set0();
     #align while (i < full_blocks) {
-        st = absorb(st, (u256)[ad_p + i]);
+        st = absorb(st, [:u256 ad_p + i]);
         i += 32;
     }
     reg u64 left;
@@ -378,9 +381,9 @@ export fn _aegis256x2_decrypt(#public reg u64 params)
         reg u256 zero = #set0_256();
         pad[0] = zero;
 
-        i = #set0();
+        ?{}, i = #set0();
         while (i < left) {
-            pad[u8(int) i] = (u8)[ad_p + i];
+            pad[:u8 i] = [:u8 ad_p + i];
             i += 1;
         }
 
@@ -392,21 +395,21 @@ export fn _aegis256x2_decrypt(#public reg u64 params)
     full_blocks = ct_len_;
     full_blocks = full_blocks & -64;
 
-    i = #set0();
+    ?{}, i = #set0();
     #align while (i < full_blocks) {
         #public reg u256 t;
-        #declassify t = (u256)[ct_p + i];
-        st, (u256)[msg_p + i] = dec(st, t);
-        #declassify t = (u256)[ct_p + i + 32];
-        st, (u256)[msg_p + i + 32] = dec(st, t);
+        #declassify t = [:u256 ct_p + i];
+        st, [:u256 msg_p + i] = dec(st, t);
+        #declassify t = [:u256 ct_p + i + 32];
+        st, [:u256 msg_p + i + 32] = dec(st, t);
         i += 64;
     }
     left = ct_len_;
     left -= i;
     if (left > 32) {
         #public reg u256 t;
-        #declassify t = (u256)[ct_p + i];
-        st, (u256)[msg_p + i] = dec(st, t);
+        #declassify t = [:u256 ct_p + i];
+        st, [:u256 msg_p + i] = dec(st, t);
         left -= 32;
         i += 32;
     }
@@ -418,9 +421,9 @@ export fn _aegis256x2_decrypt(#public reg u64 params)
         reg u256 zero = #set0_256();
         pad[0] = zero;
 
-        i = #set0();
+        ?{}, i = #set0();
         while (i < left) {
-            pad[u8(int) i] = (u8)[ct_p + i];
+            pad[:u8 i] = [:u8 ct_p + i];
             i += 1;
         }
 
@@ -429,9 +432,9 @@ export fn _aegis256x2_decrypt(#public reg u64 params)
 
         st, pad[0] = declast(st, t, left);
 
-        i = #set0();
+        ?{}, i = #set0();
         while (i < left) {
-            (u8)[msg_p + i] = pad[u8(int) i];
+            [:u8 msg_p + i] = pad[:u8 i];
             i += 1;
         }
     }
