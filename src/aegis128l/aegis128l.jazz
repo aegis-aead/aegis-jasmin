@@ -472,3 +472,96 @@ export fn _aegis128l_decrypt(reg u64 params)
 
     return ret;
 }
+
+// AEGISMAC-128L
+
+#[ct = "public × public -> secret"]
+inline fn mac(reg u64 params, inline bool verify)
+    -> reg u64
+{
+    #[public] reg u64 tag_p data_p key_p nonce_p;
+    #[public] stack u64 data_len_;
+    #[public] reg u8 tag_len;
+
+    tag_p = [:u64 params + 8 * 2];
+    #declassify(tag_p);
+    tag_len = [:u8 params + 8 * 3];
+    #declassify(tag_len);
+    data_p = [:u64 params + 8 * 6];
+    #declassify(data_p);
+    data_len_ = [:u64 params + 8 * 7];
+    #declassify(data_len_);
+    key_p = [:u64 params + 8 * 8];
+    #declassify(key_p);
+    nonce_p = [:u64 params + 8 * 9];
+    #declassify(nonce_p);
+
+    #[secret] reg u128[8] st;
+    st = init(key_p, nonce_p);
+
+    // data
+
+    reg u64 full_blocks;
+    full_blocks = data_len_;
+    full_blocks = full_blocks & -32;
+
+    reg u64 i;
+    ?{}, i = #set0();
+
+    #[align] while (i < full_blocks) {
+        reg u128[2] t;
+        t[0] = [:u128 data_p + i];
+        t[1] = [:u128 data_p + i + 16];
+        st = absorb(st, t);
+        i += 32;
+    }
+    reg u64 left;
+    left = data_len_;
+    left -= i;
+
+    if (left > 0) {
+        data_p += i;
+
+        stack u128[2] pad;
+        reg u128 zero = #set0_128();
+        pad[0] = zero;
+        pad[1] = zero;
+
+        ?{}, i = #set0();
+        while (i < left) {
+            pad[:u8 i] = [:u8 data_p + i];
+            i += 1;
+        }
+
+        reg u128[2] t;
+        t[0] = pad[0];
+        t[1] = pad[1];
+
+        st = absorb(st, t);
+    }
+
+    // finalize
+
+    reg u64 tag_len_ = (64u) tag_len;
+    reg u64 ret = finalize(st, tag_p, tag_len, data_len_, tag_len_, verify);
+
+    return ret;
+}
+
+#[ct = "public -> secret"]
+export fn _aegis128l_mac(reg u64 params)
+    -> reg u64
+{
+    reg u64 ret = mac(params, false);
+
+    return ret;
+}
+
+#[ct = "public -> secret"]
+export fn _aegis128l_mac_verify(reg u64 params)
+    -> reg u64
+{
+    reg u64 ret = mac(params, true);
+
+    return ret;
+}

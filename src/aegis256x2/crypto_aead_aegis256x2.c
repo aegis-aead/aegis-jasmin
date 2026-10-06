@@ -17,6 +17,8 @@ typedef struct Params {
 
 extern int _aegis256x2_encrypt(const Params *params);
 extern int _aegis256x2_decrypt(const Params *params);
+extern int _aegis256x2_mac(const Params *params);
+extern int _aegis256x2_mac_verify(const Params *params);
 
 int
 crypto_aead_aegis256x2_encrypt_detached(unsigned char       *c,
@@ -177,4 +179,52 @@ crypto_aead_aegis256x2t32_decrypt(unsigned char       *m,
     }
     return crypto_aead_aegis256x2t32_decrypt_detached(
         m, NULL, c, clen - 32, c + clen - 32, ad, adlen, npub, k);
+}
+
+int
+crypto_aead_aegis256x2_mac(unsigned char       *mac,
+                           const unsigned char *m,
+                           unsigned long long   mlen,
+                           const unsigned char *npub,
+                           const unsigned char *k)
+{
+    const Params params = { NULL, 0, mac, 16, NULL, 0, m, mlen, k, npub };
+    return _aegis256x2_mac(&params);
+}
+
+int
+crypto_aead_aegis256x2_mac_verify(const unsigned char *mac,
+                                  const unsigned char *m,
+                                  unsigned long long   mlen,
+                                  const unsigned char *npub,
+                                  const unsigned char *k)
+{
+    const Params params = {
+        NULL, 0, (unsigned char *) mac, 16, NULL, 0, m, mlen, k, npub
+    };
+    return _aegis256x2_mac_verify(&params);
+}
+
+int
+crypto_aead_aegis256x2t32_mac(unsigned char       *mac,
+                              const unsigned char *m,
+                              unsigned long long   mlen,
+                              const unsigned char *npub,
+                              const unsigned char *k)
+{
+    const Params params = { NULL, 0, mac, 32, NULL, 0, m, mlen, k, npub };
+    return _aegis256x2_mac(&params);
+}
+
+int
+crypto_aead_aegis256x2t32_mac_verify(const unsigned char *mac,
+                                     const unsigned char *m,
+                                     unsigned long long   mlen,
+                                     const unsigned char *npub,
+                                     const unsigned char *k)
+{
+    const Params params = {
+        NULL, 0, (unsigned char *) mac, 32, NULL, 0, m, mlen, k, npub
+    };
+    return _aegis256x2_mac_verify(&params);
 }

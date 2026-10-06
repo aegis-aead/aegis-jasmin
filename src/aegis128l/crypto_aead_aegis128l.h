@@ -119,6 +119,36 @@ int crypto_aead_aegis128lt32_decrypt_detached(unsigned char       *m,
                                               const unsigned char *k)
     __attribute__((warn_unused_result)) __attribute__((nonnull(3, 5, 8, 9)));
 
+// AEGISMAC
+
+int crypto_aead_aegis128l_mac(unsigned char       *mac,
+                              const unsigned char *m,
+                              unsigned long long   mlen,
+                              const unsigned char *npub,
+                              const unsigned char *k)
+    __attribute__((nonnull(1, 4, 5)));
+
+int crypto_aead_aegis128l_mac_verify(const unsigned char *mac,
+                                     const unsigned char *m,
+                                     unsigned long long   mlen,
+                                     const unsigned char *npub,
+                                     const unsigned char *k)
+    __attribute__((warn_unused_result)) __attribute__((nonnull(1, 4, 5)));
+
+int crypto_aead_aegis128lt32_mac(unsigned char       *mac,
+                                 const unsigned char *m,
+                                 unsigned long long   mlen,
+                                 const unsigned char *npub,
+                                 const unsigned char *k)
+    __attribute__((nonnull(1, 4, 5)));
+
+int crypto_aead_aegis128lt32_mac_verify(const unsigned char *mac,
+                                        const unsigned char *m,
+                                        unsigned long long   mlen,
+                                        const unsigned char *npub,
+                                        const unsigned char *k)
+    __attribute__((warn_unused_result)) __attribute__((nonnull(1, 4, 5)));
+
 #ifdef __cplusplus
 }
 #endif

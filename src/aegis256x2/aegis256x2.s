@@ -1,8 +1,856 @@
 	.att_syntax
 	.text
 	.p2align	5
+	.global	_aegis256x2_mac_verify
+	.global	_aegis256x2_mac
 	.global	_aegis256x2_decrypt
 	.global	_aegis256x2_encrypt
+	.type	_aegis256x2_mac_verify, %function
+_aegis256x2_mac_verify:
+	movq	%rsp, %r10
+	leaq	-64(%rsp), %rsp
+	andq	$-32, %rsp
+	movq	16(%rdi), %rax
+// declassify_val u64 %rax
+	movb	24(%rdi), %cl
+// declassify_val u8 %cl
+	movq	48(%rdi), %rdx
+// declassify_val u64 %rdx
+	movq	56(%rdi), %rsi
+	movq	%rsi, 32(%rsp)
+// declassify_val u64 32(%rsp)
+	movq	64(%rdi), %rsi
+// declassify_val u64 %rsi
+	movq	72(%rdi), %rdi
+// declassify_val u64 %rdi
+	vbroadcasti128	(%rsi), %ymm0
+	vbroadcasti128	16(%rsi), %ymm1
+	vbroadcasti128	(%rdi), %ymm2
+// declassify_val u256 %ymm2
+	vbroadcasti128	16(%rdi), %ymm3
+// declassify_val u256 %ymm3
+	vpxor	%ymm2, %ymm0, %ymm2
+	vpxor	%ymm3, %ymm1, %ymm3
+	vpxor	glob_data + 64(%rip), %ymm0, %ymm7
+	vpxor	glob_data + 32(%rip), %ymm1, %ymm8
+	vmovdqu	%ymm2, %ymm4
+	vmovdqu	%ymm3, %ymm5
+	vmovdqu	glob_data + 32(%rip), %ymm6
+	vmovdqu	glob_data + 64(%rip), %ymm9
+	vmovdqu	%ymm7, %ymm10
+	vpxor	glob_data + 0(%rip), %ymm9, %ymm9
+	vpxor	glob_data + 0(%rip), %ymm8, %ymm7
+	vmovdqu	%ymm7, %ymm11
+	vpxor	%ymm0, %ymm4, %ymm12
+	vaesenc	%ymm11, %ymm10, %ymm7
+	vaesenc	%ymm10, %ymm9, %ymm8
+	vaesenc	%ymm9, %ymm6, %ymm9
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm4, %ymm5
+	vaesenc	%ymm12, %ymm11, %ymm4
+	vpxor	glob_data + 0(%rip), %ymm9, %ymm9
+	vpxor	glob_data + 0(%rip), %ymm7, %ymm7
+	vmovdqu	%ymm7, %ymm11
+	vpxor	%ymm1, %ymm4, %ymm12
+	vaesenc	%ymm11, %ymm8, %ymm7
+	vaesenc	%ymm8, %ymm9, %ymm8
+	vaesenc	%ymm9, %ymm6, %ymm9
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm4, %ymm5
+	vaesenc	%ymm12, %ymm11, %ymm4
+	vpxor	glob_data + 0(%rip), %ymm9, %ymm9
+	vpxor	glob_data + 0(%rip), %ymm7, %ymm7
+	vmovdqu	%ymm7, %ymm11
+	vpxor	%ymm2, %ymm4, %ymm12
+	vaesenc	%ymm11, %ymm8, %ymm7
+	vaesenc	%ymm8, %ymm9, %ymm8
+	vaesenc	%ymm9, %ymm6, %ymm9
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm4, %ymm5
+	vaesenc	%ymm12, %ymm11, %ymm4
+	vpxor	glob_data + 0(%rip), %ymm9, %ymm9
+	vpxor	glob_data + 0(%rip), %ymm7, %ymm7
+	vmovdqu	%ymm7, %ymm11
+	vpxor	%ymm3, %ymm4, %ymm12
+	vaesenc	%ymm11, %ymm8, %ymm7
+	vaesenc	%ymm8, %ymm9, %ymm8
+	vaesenc	%ymm9, %ymm6, %ymm9
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm4, %ymm5
+	vaesenc	%ymm12, %ymm11, %ymm4
+	vpxor	glob_data + 0(%rip), %ymm9, %ymm9
+	vpxor	glob_data + 0(%rip), %ymm7, %ymm7
+	vmovdqu	%ymm7, %ymm11
+	vpxor	%ymm0, %ymm4, %ymm12
+	vaesenc	%ymm11, %ymm8, %ymm7
+	vaesenc	%ymm8, %ymm9, %ymm8
+	vaesenc	%ymm9, %ymm6, %ymm9
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm4, %ymm5
+	vaesenc	%ymm12, %ymm11, %ymm4
+	vpxor	glob_data + 0(%rip), %ymm9, %ymm9
+	vpxor	glob_data + 0(%rip), %ymm7, %ymm7
+	vmovdqu	%ymm7, %ymm11
+	vpxor	%ymm1, %ymm4, %ymm12
+	vaesenc	%ymm11, %ymm8, %ymm7
+	vaesenc	%ymm8, %ymm9, %ymm8
+	vaesenc	%ymm9, %ymm6, %ymm9
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm4, %ymm5
+	vaesenc	%ymm12, %ymm11, %ymm4
+	vpxor	glob_data + 0(%rip), %ymm9, %ymm9
+	vpxor	glob_data + 0(%rip), %ymm7, %ymm7
+	vmovdqu	%ymm7, %ymm11
+	vpxor	%ymm2, %ymm4, %ymm12
+	vaesenc	%ymm11, %ymm8, %ymm7
+	vaesenc	%ymm8, %ymm9, %ymm8
+	vaesenc	%ymm9, %ymm6, %ymm9
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm4, %ymm5
+	vaesenc	%ymm12, %ymm11, %ymm4
+	vpxor	glob_data + 0(%rip), %ymm9, %ymm9
+	vpxor	glob_data + 0(%rip), %ymm7, %ymm7
+	vmovdqu	%ymm7, %ymm11
+	vpxor	%ymm3, %ymm4, %ymm12
+	vaesenc	%ymm11, %ymm8, %ymm7
+	vaesenc	%ymm8, %ymm9, %ymm8
+	vaesenc	%ymm9, %ymm6, %ymm9
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm4, %ymm5
+	vaesenc	%ymm12, %ymm11, %ymm4
+	vpxor	glob_data + 0(%rip), %ymm9, %ymm9
+	vpxor	glob_data + 0(%rip), %ymm7, %ymm7
+	vmovdqu	%ymm7, %ymm11
+	vpxor	%ymm0, %ymm4, %ymm12
+	vaesenc	%ymm11, %ymm8, %ymm7
+	vaesenc	%ymm8, %ymm9, %ymm8
+	vaesenc	%ymm9, %ymm6, %ymm9
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm4, %ymm5
+	vaesenc	%ymm12, %ymm11, %ymm4
+	vpxor	glob_data + 0(%rip), %ymm9, %ymm9
+	vpxor	glob_data + 0(%rip), %ymm7, %ymm7
+	vmovdqu	%ymm7, %ymm11
+	vpxor	%ymm1, %ymm4, %ymm12
+	vaesenc	%ymm11, %ymm8, %ymm7
+	vaesenc	%ymm8, %ymm9, %ymm8
+	vaesenc	%ymm9, %ymm6, %ymm9
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm4, %ymm5
+	vaesenc	%ymm12, %ymm11, %ymm4
+	vpxor	glob_data + 0(%rip), %ymm9, %ymm9
+	vpxor	glob_data + 0(%rip), %ymm7, %ymm7
+	vmovdqu	%ymm7, %ymm11
+	vpxor	%ymm2, %ymm4, %ymm12
+	vaesenc	%ymm11, %ymm8, %ymm7
+	vaesenc	%ymm8, %ymm9, %ymm8
+	vaesenc	%ymm9, %ymm6, %ymm9
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm4, %ymm5
+	vaesenc	%ymm12, %ymm11, %ymm4
+	vpxor	glob_data + 0(%rip), %ymm9, %ymm9
+	vpxor	glob_data + 0(%rip), %ymm7, %ymm7
+	vmovdqu	%ymm7, %ymm11
+	vpxor	%ymm3, %ymm4, %ymm12
+	vaesenc	%ymm11, %ymm8, %ymm7
+	vaesenc	%ymm8, %ymm9, %ymm8
+	vaesenc	%ymm9, %ymm6, %ymm9
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm4, %ymm5
+	vaesenc	%ymm12, %ymm11, %ymm4
+	vpxor	glob_data + 0(%rip), %ymm9, %ymm9
+	vpxor	glob_data + 0(%rip), %ymm7, %ymm7
+	vmovdqu	%ymm7, %ymm11
+	vpxor	%ymm0, %ymm4, %ymm12
+	vaesenc	%ymm11, %ymm8, %ymm7
+	vaesenc	%ymm8, %ymm9, %ymm8
+	vaesenc	%ymm9, %ymm6, %ymm0
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm4, %ymm5
+	vaesenc	%ymm12, %ymm11, %ymm4
+	vpxor	glob_data + 0(%rip), %ymm0, %ymm0
+	vpxor	glob_data + 0(%rip), %ymm7, %ymm7
+	vpxor	%ymm1, %ymm4, %ymm12
+	vaesenc	%ymm7, %ymm8, %ymm1
+	vaesenc	%ymm8, %ymm0, %ymm8
+	vaesenc	%ymm0, %ymm6, %ymm0
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm4, %ymm5
+	vaesenc	%ymm12, %ymm7, %ymm4
+	vpxor	glob_data + 0(%rip), %ymm0, %ymm0
+	vpxor	glob_data + 0(%rip), %ymm1, %ymm1
+	vpxor	%ymm2, %ymm4, %ymm12
+	vaesenc	%ymm1, %ymm8, %ymm7
+	vaesenc	%ymm8, %ymm0, %ymm8
+	vaesenc	%ymm0, %ymm6, %ymm0
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm4, %ymm5
+	vaesenc	%ymm12, %ymm1, %ymm4
+	vpxor	glob_data + 0(%rip), %ymm0, %ymm0
+	vpxor	glob_data + 0(%rip), %ymm7, %ymm1
+	vpxor	%ymm3, %ymm4, %ymm12
+	vaesenc	%ymm1, %ymm8, %ymm7
+	vaesenc	%ymm8, %ymm0, %ymm8
+	vaesenc	%ymm0, %ymm6, %ymm0
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm4, %ymm5
+	vaesenc	%ymm12, %ymm1, %ymm4
+	movq	32(%rsp), %rsi
+	andq	$-32, %rsi
+	xorl	%edi, %edi
+	jmp 	.L_aegis256x2_mac_verify$8
+	.p2align	5
+.L_aegis256x2_mac_verify$9:
+	vmovdqu	(%rdx,%rdi), %ymm1
+	vmovdqu	%ymm7, %ymm11
+	vpxor	%ymm1, %ymm4, %ymm12
+	vaesenc	%ymm11, %ymm8, %ymm7
+	vaesenc	%ymm8, %ymm0, %ymm8
+	vaesenc	%ymm0, %ymm6, %ymm0
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm4, %ymm5
+	vaesenc	%ymm12, %ymm11, %ymm4
+	addq	$32, %rdi
+.L_aegis256x2_mac_verify$8:
+	cmpq	%rsi, %rdi
+	jb  	.L_aegis256x2_mac_verify$9
+	movq	32(%rsp), %rsi
+	subq	%rdi, %rsi
+	cmpq	$0, %rsi
+	jbe 	.L_aegis256x2_mac_verify$5
+	addq	%rdi, %rdx
+	vpxor	%ymm1, %ymm1, %ymm1
+	vmovdqu	%ymm1, (%rsp)
+	xorl	%edi, %edi
+	jmp 	.L_aegis256x2_mac_verify$6
+.L_aegis256x2_mac_verify$7:
+	movb	(%rdx,%rdi), %r8b
+	movb	%r8b, (%rsp,%rdi)
+	incq	%rdi
+.L_aegis256x2_mac_verify$6:
+	cmpq	%rsi, %rdi
+	jb  	.L_aegis256x2_mac_verify$7
+	vmovdqu	(%rsp), %ymm1
+	vmovdqu	%ymm7, %ymm11
+	vpxor	%ymm1, %ymm4, %ymm12
+	vaesenc	%ymm11, %ymm8, %ymm7
+	vaesenc	%ymm8, %ymm0, %ymm8
+	vaesenc	%ymm0, %ymm6, %ymm0
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm4, %ymm5
+	vaesenc	%ymm12, %ymm11, %ymm4
+.L_aegis256x2_mac_verify$5:
+	movq	32(%rsp), %rdx
+	movzbq	%cl, %rsi
+	shlq	$3, %rsi
+	shlq	$3, %rdx
+	movq	%rdx, (%rsp)
+	movq	%rdx, 16(%rsp)
+	movq	%rsi, 8(%rsp)
+	movq	%rsi, 24(%rsp)
+	vpxor	(%rsp), %ymm0, %ymm1
+	vpxor	%ymm1, %ymm4, %ymm12
+	vaesenc	%ymm7, %ymm8, %ymm2
+	vaesenc	%ymm8, %ymm0, %ymm8
+	vaesenc	%ymm0, %ymm6, %ymm0
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm4, %ymm5
+	vaesenc	%ymm12, %ymm7, %ymm4
+	vpxor	%ymm1, %ymm4, %ymm12
+	vaesenc	%ymm2, %ymm8, %ymm7
+	vaesenc	%ymm8, %ymm0, %ymm8
+	vaesenc	%ymm0, %ymm6, %ymm0
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm4, %ymm5
+	vaesenc	%ymm12, %ymm2, %ymm4
+	vpxor	%ymm1, %ymm4, %ymm12
+	vaesenc	%ymm7, %ymm8, %ymm2
+	vaesenc	%ymm8, %ymm0, %ymm8
+	vaesenc	%ymm0, %ymm6, %ymm0
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm4, %ymm5
+	vaesenc	%ymm12, %ymm7, %ymm4
+	vpxor	%ymm1, %ymm4, %ymm12
+	vaesenc	%ymm2, %ymm8, %ymm7
+	vaesenc	%ymm8, %ymm0, %ymm8
+	vaesenc	%ymm0, %ymm6, %ymm0
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm4, %ymm5
+	vaesenc	%ymm12, %ymm2, %ymm4
+	vpxor	%ymm1, %ymm4, %ymm12
+	vaesenc	%ymm7, %ymm8, %ymm2
+	vaesenc	%ymm8, %ymm0, %ymm8
+	vaesenc	%ymm0, %ymm6, %ymm0
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm4, %ymm5
+	vaesenc	%ymm12, %ymm7, %ymm4
+	vpxor	%ymm1, %ymm4, %ymm12
+	vaesenc	%ymm2, %ymm8, %ymm7
+	vaesenc	%ymm8, %ymm0, %ymm8
+	vaesenc	%ymm0, %ymm6, %ymm0
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm4, %ymm5
+	vaesenc	%ymm12, %ymm2, %ymm4
+	vmovdqu	%ymm7, %ymm2
+	vpxor	%ymm1, %ymm4, %ymm12
+	vaesenc	%ymm2, %ymm8, %ymm7
+	vaesenc	%ymm8, %ymm0, %ymm8
+	vaesenc	%ymm0, %ymm6, %ymm0
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm4, %ymm5
+	vaesenc	%ymm12, %ymm2, %ymm4
+	cmpb	$16, %cl
+	je  	.L_aegis256x2_mac_verify$3
+	vpxor	%ymm5, %ymm4, %ymm1
+	vpxor	%ymm8, %ymm0, %ymm2
+	vpxor	%ymm6, %ymm1, %ymm1
+	vpxor	%ymm7, %ymm2, %ymm2
+	vperm2i128	$129, %ymm1, %ymm1, %ymm3
+	vperm2i128	$129, %ymm2, %ymm2, %ymm1
+	vpxor	%ymm3, %ymm4, %ymm12
+	vaesenc	%ymm7, %ymm8, %ymm2
+	vaesenc	%ymm8, %ymm0, %ymm8
+	vaesenc	%ymm0, %ymm6, %ymm0
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm4, %ymm5
+	vaesenc	%ymm12, %ymm7, %ymm4
+	vpxor	%ymm1, %ymm4, %ymm12
+	vaesenc	%ymm2, %ymm8, %ymm7
+	vaesenc	%ymm8, %ymm0, %ymm8
+	vaesenc	%ymm0, %ymm6, %ymm0
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm4, %ymm5
+	vaesenc	%ymm12, %ymm2, %ymm4
+	jmp 	.L_aegis256x2_mac_verify$4
+.L_aegis256x2_mac_verify$3:
+	vpxor	%ymm5, %ymm4, %ymm1
+	vpxor	%ymm6, %ymm1, %ymm1
+	vpxor	%ymm0, %ymm1, %ymm1
+	vpxor	%ymm8, %ymm1, %ymm1
+	vpxor	%ymm7, %ymm1, %ymm1
+	vperm2i128	$129, %ymm1, %ymm1, %ymm1
+	vmovdqu	%ymm7, %ymm2
+	vpxor	%ymm1, %ymm4, %ymm12
+	vaesenc	%ymm2, %ymm8, %ymm7
+	vaesenc	%ymm8, %ymm0, %ymm8
+	vaesenc	%ymm0, %ymm6, %ymm0
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm4, %ymm5
+	vaesenc	%ymm12, %ymm2, %ymm4
+.L_aegis256x2_mac_verify$4:
+	movq	$2, %rdx
+	movq	%rdx, (%rsp)
+	movq	%rsi, 8(%rsp)
+	vpxor	(%rsp), %ymm0, %ymm12
+	vperm2i128	$128, %ymm12, %ymm12, %ymm1
+	vpxor	%ymm1, %ymm4, %ymm12
+	vaesenc	%ymm7, %ymm8, %ymm2
+	vaesenc	%ymm8, %ymm0, %ymm8
+	vaesenc	%ymm0, %ymm6, %ymm0
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm4, %ymm5
+	vaesenc	%ymm12, %ymm7, %ymm4
+	vpxor	%ymm1, %ymm4, %ymm12
+	vaesenc	%ymm2, %ymm8, %ymm7
+	vaesenc	%ymm8, %ymm0, %ymm8
+	vaesenc	%ymm0, %ymm6, %ymm0
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm4, %ymm5
+	vaesenc	%ymm12, %ymm2, %ymm4
+	vpxor	%ymm1, %ymm4, %ymm12
+	vaesenc	%ymm7, %ymm8, %ymm2
+	vaesenc	%ymm8, %ymm0, %ymm8
+	vaesenc	%ymm0, %ymm6, %ymm0
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm4, %ymm5
+	vaesenc	%ymm12, %ymm7, %ymm4
+	vpxor	%ymm1, %ymm4, %ymm12
+	vaesenc	%ymm2, %ymm8, %ymm7
+	vaesenc	%ymm8, %ymm0, %ymm8
+	vaesenc	%ymm0, %ymm6, %ymm0
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm4, %ymm5
+	vaesenc	%ymm12, %ymm2, %ymm4
+	vpxor	%ymm1, %ymm4, %ymm12
+	vaesenc	%ymm7, %ymm8, %ymm2
+	vaesenc	%ymm8, %ymm0, %ymm8
+	vaesenc	%ymm0, %ymm6, %ymm0
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm4, %ymm5
+	vaesenc	%ymm12, %ymm7, %ymm4
+	vpxor	%ymm1, %ymm4, %ymm12
+	vaesenc	%ymm2, %ymm8, %ymm7
+	vaesenc	%ymm8, %ymm0, %ymm8
+	vaesenc	%ymm0, %ymm6, %ymm0
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm4, %ymm5
+	vaesenc	%ymm12, %ymm2, %ymm4
+	vmovdqu	%ymm7, %ymm2
+	vpxor	%ymm1, %ymm4, %ymm12
+	vaesenc	%ymm2, %ymm8, %ymm7
+	vaesenc	%ymm8, %ymm0, %ymm8
+	vaesenc	%ymm0, %ymm6, %ymm0
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm4, %ymm5
+	vaesenc	%ymm12, %ymm2, %ymm4
+	cmpb	$16, %cl
+	je  	.L_aegis256x2_mac_verify$1
+	vpxor	%ymm5, %ymm4, %ymm1
+	vpxor	%ymm8, %ymm0, %ymm0
+	vpxor	%ymm6, %ymm1, %ymm1
+	vpxor	%ymm7, %ymm0, %ymm0
+	vmovdqu	(%rax), %xmm2
+	vmovdqu	16(%rax), %xmm3
+	vpcmpeqq	%xmm1, %xmm2, %xmm2
+	vpcmpeqq	%xmm0, %xmm3, %xmm3
+	vpand	%xmm3, %xmm2, %xmm2
+	vpmovmskb	%xmm2, %eax
+	incq	%rax
+	shrq	$16, %rax
+	decq	%rax
+	jmp 	.L_aegis256x2_mac_verify$2
+.L_aegis256x2_mac_verify$1:
+	vpxor	%ymm5, %ymm4, %ymm1
+	vpxor	%ymm6, %ymm1, %ymm1
+	vpxor	%ymm0, %ymm1, %ymm1
+	vpxor	%ymm8, %ymm1, %ymm1
+	vpxor	%ymm7, %ymm1, %ymm1
+	vmovdqu	(%rax), %xmm0
+	vpcmpeqq	%xmm1, %xmm0, %xmm0
+	vpmovmskb	%xmm0, %eax
+	incq	%rax
+	shrq	$16, %rax
+	decq	%rax
+.L_aegis256x2_mac_verify$2:
+	movq	%r10, %rsp
+	movq	%rsp, %rsi
+	vpxor	%xmm2, %xmm2, %xmm2
+	andq	$-32, %rsp
+	subq	$64, %rsp
+	vmovdqu	%xmm2, 48(%rsp)
+	vmovdqu	%xmm2, 32(%rsp)
+	vmovdqu	%xmm2, 16(%rsp)
+	vmovdqu	%xmm2, (%rsp)
+	movq	%rsi, %rsp
+	ret
+	.type	_aegis256x2_mac, %function
+_aegis256x2_mac:
+	movq	%rsp, %r10
+	leaq	-64(%rsp), %rsp
+	andq	$-32, %rsp
+	movq	16(%rdi), %rax
+// declassify_val u64 %rax
+	movb	24(%rdi), %cl
+// declassify_val u8 %cl
+	movq	48(%rdi), %rdx
+// declassify_val u64 %rdx
+	movq	56(%rdi), %rsi
+	movq	%rsi, 32(%rsp)
+// declassify_val u64 32(%rsp)
+	movq	64(%rdi), %rsi
+// declassify_val u64 %rsi
+	movq	72(%rdi), %rdi
+// declassify_val u64 %rdi
+	vbroadcasti128	(%rsi), %ymm0
+	vbroadcasti128	16(%rsi), %ymm1
+	vbroadcasti128	(%rdi), %ymm2
+// declassify_val u256 %ymm2
+	vbroadcasti128	16(%rdi), %ymm3
+// declassify_val u256 %ymm3
+	vpxor	%ymm2, %ymm0, %ymm2
+	vpxor	%ymm3, %ymm1, %ymm3
+	vpxor	glob_data + 64(%rip), %ymm0, %ymm7
+	vpxor	glob_data + 32(%rip), %ymm1, %ymm8
+	vmovdqu	%ymm2, %ymm4
+	vmovdqu	%ymm3, %ymm5
+	vmovdqu	glob_data + 32(%rip), %ymm6
+	vmovdqu	glob_data + 64(%rip), %ymm9
+	vmovdqu	%ymm7, %ymm10
+	vpxor	glob_data + 0(%rip), %ymm9, %ymm9
+	vpxor	glob_data + 0(%rip), %ymm8, %ymm7
+	vmovdqu	%ymm7, %ymm11
+	vpxor	%ymm0, %ymm4, %ymm12
+	vaesenc	%ymm11, %ymm10, %ymm7
+	vaesenc	%ymm10, %ymm9, %ymm8
+	vaesenc	%ymm9, %ymm6, %ymm9
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm4, %ymm5
+	vaesenc	%ymm12, %ymm11, %ymm4
+	vpxor	glob_data + 0(%rip), %ymm9, %ymm9
+	vpxor	glob_data + 0(%rip), %ymm7, %ymm7
+	vmovdqu	%ymm7, %ymm11
+	vpxor	%ymm1, %ymm4, %ymm12
+	vaesenc	%ymm11, %ymm8, %ymm7
+	vaesenc	%ymm8, %ymm9, %ymm8
+	vaesenc	%ymm9, %ymm6, %ymm9
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm4, %ymm5
+	vaesenc	%ymm12, %ymm11, %ymm4
+	vpxor	glob_data + 0(%rip), %ymm9, %ymm9
+	vpxor	glob_data + 0(%rip), %ymm7, %ymm7
+	vmovdqu	%ymm7, %ymm11
+	vpxor	%ymm2, %ymm4, %ymm12
+	vaesenc	%ymm11, %ymm8, %ymm7
+	vaesenc	%ymm8, %ymm9, %ymm8
+	vaesenc	%ymm9, %ymm6, %ymm9
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm4, %ymm5
+	vaesenc	%ymm12, %ymm11, %ymm4
+	vpxor	glob_data + 0(%rip), %ymm9, %ymm9
+	vpxor	glob_data + 0(%rip), %ymm7, %ymm7
+	vmovdqu	%ymm7, %ymm11
+	vpxor	%ymm3, %ymm4, %ymm12
+	vaesenc	%ymm11, %ymm8, %ymm7
+	vaesenc	%ymm8, %ymm9, %ymm8
+	vaesenc	%ymm9, %ymm6, %ymm9
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm4, %ymm5
+	vaesenc	%ymm12, %ymm11, %ymm4
+	vpxor	glob_data + 0(%rip), %ymm9, %ymm9
+	vpxor	glob_data + 0(%rip), %ymm7, %ymm7
+	vmovdqu	%ymm7, %ymm11
+	vpxor	%ymm0, %ymm4, %ymm12
+	vaesenc	%ymm11, %ymm8, %ymm7
+	vaesenc	%ymm8, %ymm9, %ymm8
+	vaesenc	%ymm9, %ymm6, %ymm9
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm4, %ymm5
+	vaesenc	%ymm12, %ymm11, %ymm4
+	vpxor	glob_data + 0(%rip), %ymm9, %ymm9
+	vpxor	glob_data + 0(%rip), %ymm7, %ymm7
+	vmovdqu	%ymm7, %ymm11
+	vpxor	%ymm1, %ymm4, %ymm12
+	vaesenc	%ymm11, %ymm8, %ymm7
+	vaesenc	%ymm8, %ymm9, %ymm8
+	vaesenc	%ymm9, %ymm6, %ymm9
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm4, %ymm5
+	vaesenc	%ymm12, %ymm11, %ymm4
+	vpxor	glob_data + 0(%rip), %ymm9, %ymm9
+	vpxor	glob_data + 0(%rip), %ymm7, %ymm7
+	vmovdqu	%ymm7, %ymm11
+	vpxor	%ymm2, %ymm4, %ymm12
+	vaesenc	%ymm11, %ymm8, %ymm7
+	vaesenc	%ymm8, %ymm9, %ymm8
+	vaesenc	%ymm9, %ymm6, %ymm9
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm4, %ymm5
+	vaesenc	%ymm12, %ymm11, %ymm4
+	vpxor	glob_data + 0(%rip), %ymm9, %ymm9
+	vpxor	glob_data + 0(%rip), %ymm7, %ymm7
+	vmovdqu	%ymm7, %ymm11
+	vpxor	%ymm3, %ymm4, %ymm12
+	vaesenc	%ymm11, %ymm8, %ymm7
+	vaesenc	%ymm8, %ymm9, %ymm8
+	vaesenc	%ymm9, %ymm6, %ymm9
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm4, %ymm5
+	vaesenc	%ymm12, %ymm11, %ymm4
+	vpxor	glob_data + 0(%rip), %ymm9, %ymm9
+	vpxor	glob_data + 0(%rip), %ymm7, %ymm7
+	vmovdqu	%ymm7, %ymm11
+	vpxor	%ymm0, %ymm4, %ymm12
+	vaesenc	%ymm11, %ymm8, %ymm7
+	vaesenc	%ymm8, %ymm9, %ymm8
+	vaesenc	%ymm9, %ymm6, %ymm9
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm4, %ymm5
+	vaesenc	%ymm12, %ymm11, %ymm4
+	vpxor	glob_data + 0(%rip), %ymm9, %ymm9
+	vpxor	glob_data + 0(%rip), %ymm7, %ymm7
+	vmovdqu	%ymm7, %ymm11
+	vpxor	%ymm1, %ymm4, %ymm12
+	vaesenc	%ymm11, %ymm8, %ymm7
+	vaesenc	%ymm8, %ymm9, %ymm8
+	vaesenc	%ymm9, %ymm6, %ymm9
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm4, %ymm5
+	vaesenc	%ymm12, %ymm11, %ymm4
+	vpxor	glob_data + 0(%rip), %ymm9, %ymm9
+	vpxor	glob_data + 0(%rip), %ymm7, %ymm7
+	vmovdqu	%ymm7, %ymm11
+	vpxor	%ymm2, %ymm4, %ymm12
+	vaesenc	%ymm11, %ymm8, %ymm7
+	vaesenc	%ymm8, %ymm9, %ymm8
+	vaesenc	%ymm9, %ymm6, %ymm9
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm4, %ymm5
+	vaesenc	%ymm12, %ymm11, %ymm4
+	vpxor	glob_data + 0(%rip), %ymm9, %ymm9
+	vpxor	glob_data + 0(%rip), %ymm7, %ymm7
+	vmovdqu	%ymm7, %ymm11
+	vpxor	%ymm3, %ymm4, %ymm12
+	vaesenc	%ymm11, %ymm8, %ymm7
+	vaesenc	%ymm8, %ymm9, %ymm8
+	vaesenc	%ymm9, %ymm6, %ymm9
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm4, %ymm5
+	vaesenc	%ymm12, %ymm11, %ymm4
+	vpxor	glob_data + 0(%rip), %ymm9, %ymm9
+	vpxor	glob_data + 0(%rip), %ymm7, %ymm7
+	vmovdqu	%ymm7, %ymm11
+	vpxor	%ymm0, %ymm4, %ymm12
+	vaesenc	%ymm11, %ymm8, %ymm7
+	vaesenc	%ymm8, %ymm9, %ymm8
+	vaesenc	%ymm9, %ymm6, %ymm0
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm4, %ymm5
+	vaesenc	%ymm12, %ymm11, %ymm4
+	vpxor	glob_data + 0(%rip), %ymm0, %ymm0
+	vpxor	glob_data + 0(%rip), %ymm7, %ymm7
+	vpxor	%ymm1, %ymm4, %ymm12
+	vaesenc	%ymm7, %ymm8, %ymm1
+	vaesenc	%ymm8, %ymm0, %ymm8
+	vaesenc	%ymm0, %ymm6, %ymm0
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm4, %ymm5
+	vaesenc	%ymm12, %ymm7, %ymm4
+	vpxor	glob_data + 0(%rip), %ymm0, %ymm0
+	vpxor	glob_data + 0(%rip), %ymm1, %ymm1
+	vpxor	%ymm2, %ymm4, %ymm12
+	vaesenc	%ymm1, %ymm8, %ymm2
+	vaesenc	%ymm8, %ymm0, %ymm8
+	vaesenc	%ymm0, %ymm6, %ymm0
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm4, %ymm5
+	vaesenc	%ymm12, %ymm1, %ymm4
+	vpxor	glob_data + 0(%rip), %ymm0, %ymm0
+	vpxor	glob_data + 0(%rip), %ymm2, %ymm1
+	vpxor	%ymm3, %ymm4, %ymm12
+	vaesenc	%ymm1, %ymm8, %ymm7
+	vaesenc	%ymm8, %ymm0, %ymm8
+	vaesenc	%ymm0, %ymm6, %ymm0
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm4, %ymm5
+	vaesenc	%ymm12, %ymm1, %ymm4
+	movq	32(%rsp), %rsi
+	andq	$-32, %rsi
+	xorl	%edi, %edi
+	jmp 	.L_aegis256x2_mac$8
+	.p2align	5
+.L_aegis256x2_mac$9:
+	vmovdqu	(%rdx,%rdi), %ymm1
+	vmovdqu	%ymm7, %ymm2
+	vpxor	%ymm1, %ymm4, %ymm12
+	vaesenc	%ymm2, %ymm8, %ymm7
+	vaesenc	%ymm8, %ymm0, %ymm8
+	vaesenc	%ymm0, %ymm6, %ymm0
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm4, %ymm5
+	vaesenc	%ymm12, %ymm2, %ymm4
+	addq	$32, %rdi
+.L_aegis256x2_mac$8:
+	cmpq	%rsi, %rdi
+	jb  	.L_aegis256x2_mac$9
+	movq	32(%rsp), %rsi
+	subq	%rdi, %rsi
+	cmpq	$0, %rsi
+	jbe 	.L_aegis256x2_mac$5
+	addq	%rdi, %rdx
+	vpxor	%ymm1, %ymm1, %ymm1
+	vmovdqu	%ymm1, (%rsp)
+	xorl	%edi, %edi
+	jmp 	.L_aegis256x2_mac$6
+.L_aegis256x2_mac$7:
+	movb	(%rdx,%rdi), %r8b
+	movb	%r8b, (%rsp,%rdi)
+	incq	%rdi
+.L_aegis256x2_mac$6:
+	cmpq	%rsi, %rdi
+	jb  	.L_aegis256x2_mac$7
+	vmovdqu	(%rsp), %ymm1
+	vmovdqu	%ymm7, %ymm2
+	vpxor	%ymm1, %ymm4, %ymm12
+	vaesenc	%ymm2, %ymm8, %ymm7
+	vaesenc	%ymm8, %ymm0, %ymm8
+	vaesenc	%ymm0, %ymm6, %ymm0
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm4, %ymm5
+	vaesenc	%ymm12, %ymm2, %ymm4
+.L_aegis256x2_mac$5:
+	movq	32(%rsp), %rdx
+	xorl	%esi, %esi
+	movzbq	%cl, %rdi
+	shlq	$3, %rdi
+	shlq	$3, %rdx
+	movq	%rdx, (%rsp)
+	movq	%rdx, 16(%rsp)
+	movq	%rdi, 8(%rsp)
+	movq	%rdi, 24(%rsp)
+	vpxor	(%rsp), %ymm0, %ymm1
+	vpxor	%ymm1, %ymm4, %ymm12
+	vaesenc	%ymm7, %ymm8, %ymm2
+	vaesenc	%ymm8, %ymm0, %ymm8
+	vaesenc	%ymm0, %ymm6, %ymm0
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm4, %ymm5
+	vaesenc	%ymm12, %ymm7, %ymm4
+	vpxor	%ymm1, %ymm4, %ymm12
+	vaesenc	%ymm2, %ymm8, %ymm7
+	vaesenc	%ymm8, %ymm0, %ymm8
+	vaesenc	%ymm0, %ymm6, %ymm0
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm4, %ymm5
+	vaesenc	%ymm12, %ymm2, %ymm4
+	vpxor	%ymm1, %ymm4, %ymm12
+	vaesenc	%ymm7, %ymm8, %ymm2
+	vaesenc	%ymm8, %ymm0, %ymm8
+	vaesenc	%ymm0, %ymm6, %ymm0
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm4, %ymm5
+	vaesenc	%ymm12, %ymm7, %ymm4
+	vpxor	%ymm1, %ymm4, %ymm12
+	vaesenc	%ymm2, %ymm8, %ymm7
+	vaesenc	%ymm8, %ymm0, %ymm8
+	vaesenc	%ymm0, %ymm6, %ymm0
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm4, %ymm5
+	vaesenc	%ymm12, %ymm2, %ymm4
+	vpxor	%ymm1, %ymm4, %ymm12
+	vaesenc	%ymm7, %ymm8, %ymm2
+	vaesenc	%ymm8, %ymm0, %ymm8
+	vaesenc	%ymm0, %ymm6, %ymm0
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm4, %ymm5
+	vaesenc	%ymm12, %ymm7, %ymm4
+	vpxor	%ymm1, %ymm4, %ymm12
+	vaesenc	%ymm2, %ymm8, %ymm7
+	vaesenc	%ymm8, %ymm0, %ymm8
+	vaesenc	%ymm0, %ymm6, %ymm0
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm4, %ymm5
+	vaesenc	%ymm12, %ymm2, %ymm4
+	vmovdqu	%ymm7, %ymm2
+	vpxor	%ymm1, %ymm4, %ymm12
+	vaesenc	%ymm2, %ymm8, %ymm7
+	vaesenc	%ymm8, %ymm0, %ymm8
+	vaesenc	%ymm0, %ymm6, %ymm0
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm4, %ymm5
+	vaesenc	%ymm12, %ymm2, %ymm4
+	cmpb	$16, %cl
+	je  	.L_aegis256x2_mac$3
+	vpxor	%ymm5, %ymm4, %ymm1
+	vpxor	%ymm8, %ymm0, %ymm2
+	vpxor	%ymm6, %ymm1, %ymm1
+	vpxor	%ymm7, %ymm2, %ymm2
+	vperm2i128	$129, %ymm1, %ymm1, %ymm3
+	vperm2i128	$129, %ymm2, %ymm2, %ymm1
+	vpxor	%ymm3, %ymm4, %ymm12
+	vaesenc	%ymm7, %ymm8, %ymm2
+	vaesenc	%ymm8, %ymm0, %ymm8
+	vaesenc	%ymm0, %ymm6, %ymm0
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm4, %ymm5
+	vaesenc	%ymm12, %ymm7, %ymm4
+	vpxor	%ymm1, %ymm4, %ymm12
+	vaesenc	%ymm2, %ymm8, %ymm7
+	vaesenc	%ymm8, %ymm0, %ymm8
+	vaesenc	%ymm0, %ymm6, %ymm0
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm4, %ymm5
+	vaesenc	%ymm12, %ymm2, %ymm4
+	jmp 	.L_aegis256x2_mac$4
+.L_aegis256x2_mac$3:
+	vpxor	%ymm5, %ymm4, %ymm1
+	vpxor	%ymm6, %ymm1, %ymm1
+	vpxor	%ymm0, %ymm1, %ymm1
+	vpxor	%ymm8, %ymm1, %ymm1
+	vpxor	%ymm7, %ymm1, %ymm1
+	vperm2i128	$129, %ymm1, %ymm1, %ymm1
+	vmovdqu	%ymm7, %ymm2
+	vpxor	%ymm1, %ymm4, %ymm12
+	vaesenc	%ymm2, %ymm8, %ymm7
+	vaesenc	%ymm8, %ymm0, %ymm8
+	vaesenc	%ymm0, %ymm6, %ymm0
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm4, %ymm5
+	vaesenc	%ymm12, %ymm2, %ymm4
+.L_aegis256x2_mac$4:
+	movq	$2, %rdx
+	movq	%rdx, (%rsp)
+	movq	%rdi, 8(%rsp)
+	vpxor	(%rsp), %ymm0, %ymm12
+	vperm2i128	$128, %ymm12, %ymm12, %ymm1
+	vpxor	%ymm1, %ymm4, %ymm12
+	vaesenc	%ymm7, %ymm8, %ymm2
+	vaesenc	%ymm8, %ymm0, %ymm8
+	vaesenc	%ymm0, %ymm6, %ymm0
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm4, %ymm5
+	vaesenc	%ymm12, %ymm7, %ymm4
+	vpxor	%ymm1, %ymm4, %ymm12
+	vaesenc	%ymm2, %ymm8, %ymm7
+	vaesenc	%ymm8, %ymm0, %ymm8
+	vaesenc	%ymm0, %ymm6, %ymm0
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm4, %ymm5
+	vaesenc	%ymm12, %ymm2, %ymm4
+	vpxor	%ymm1, %ymm4, %ymm12
+	vaesenc	%ymm7, %ymm8, %ymm2
+	vaesenc	%ymm8, %ymm0, %ymm8
+	vaesenc	%ymm0, %ymm6, %ymm0
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm4, %ymm5
+	vaesenc	%ymm12, %ymm7, %ymm4
+	vpxor	%ymm1, %ymm4, %ymm12
+	vaesenc	%ymm2, %ymm8, %ymm7
+	vaesenc	%ymm8, %ymm0, %ymm8
+	vaesenc	%ymm0, %ymm6, %ymm0
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm4, %ymm5
+	vaesenc	%ymm12, %ymm2, %ymm4
+	vpxor	%ymm1, %ymm4, %ymm12
+	vaesenc	%ymm7, %ymm8, %ymm2
+	vaesenc	%ymm8, %ymm0, %ymm8
+	vaesenc	%ymm0, %ymm6, %ymm0
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm4, %ymm5
+	vaesenc	%ymm12, %ymm7, %ymm4
+	vpxor	%ymm1, %ymm4, %ymm12
+	vaesenc	%ymm2, %ymm8, %ymm7
+	vaesenc	%ymm8, %ymm0, %ymm8
+	vaesenc	%ymm0, %ymm6, %ymm0
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm4, %ymm5
+	vaesenc	%ymm12, %ymm2, %ymm4
+	vmovdqu	%ymm7, %ymm2
+	vpxor	%ymm1, %ymm4, %ymm12
+	vaesenc	%ymm2, %ymm8, %ymm7
+	vaesenc	%ymm8, %ymm0, %ymm8
+	vaesenc	%ymm0, %ymm6, %ymm0
+	vaesenc	%ymm6, %ymm5, %ymm6
+	vaesenc	%ymm5, %ymm4, %ymm5
+	vaesenc	%ymm12, %ymm2, %ymm4
+	cmpb	$16, %cl
+	je  	.L_aegis256x2_mac$1
+	vpxor	%ymm5, %ymm4, %ymm1
+	vpxor	%ymm8, %ymm0, %ymm0
+	vpxor	%ymm6, %ymm1, %ymm1
+	vpxor	%ymm7, %ymm0, %ymm0
+	vmovdqu	%xmm1, (%rax)
+	vmovdqu	%xmm0, 16(%rax)
+	jmp 	.L_aegis256x2_mac$2
+.L_aegis256x2_mac$1:
+	vpxor	%ymm5, %ymm4, %ymm1
+	vpxor	%ymm6, %ymm1, %ymm1
+	vpxor	%ymm0, %ymm1, %ymm1
+	vpxor	%ymm8, %ymm1, %ymm1
+	vpxor	%ymm7, %ymm1, %ymm1
+	vmovdqu	%xmm1, (%rax)
+.L_aegis256x2_mac$2:
+	movq	%rsi, %rax
+	movq	%r10, %rsp
+	movq	%rsp, %rsi
+	vpxor	%xmm2, %xmm2, %xmm2
+	andq	$-32, %rsp
+	subq	$64, %rsp
+	vmovdqu	%xmm2, 48(%rsp)
+	vmovdqu	%xmm2, 32(%rsp)
+	vmovdqu	%xmm2, 16(%rsp)
+	vmovdqu	%xmm2, (%rsp)
+	movq	%rsi, %rsp
+	ret
 	.type	_aegis256x2_decrypt, %function
 _aegis256x2_decrypt:
 	movq	%rsp, %r11
@@ -10,8 +858,8 @@ _aegis256x2_decrypt:
 	andq	$-32, %rsp
 	movq	(%rdi), %rax
 // declassify_val u64 %rax
-	movq	8(%rdi), %rcx
-	movq	%rcx, 64(%rsp)
+	movq	8(%rdi), %rsi
+	movq	%rsi, 64(%rsp)
 // declassify_val u64 64(%rsp)
 	movq	16(%rdi), %rcx
 // declassify_val u64 %rcx
@@ -185,14 +1033,14 @@ _aegis256x2_decrypt:
 	vpxor	glob_data + 0(%rip), %ymm0, %ymm0
 	vpxor	glob_data + 0(%rip), %ymm1, %ymm1
 	vpxor	%ymm2, %ymm4, %ymm12
-	vaesenc	%ymm1, %ymm8, %ymm7
+	vaesenc	%ymm1, %ymm8, %ymm2
 	vaesenc	%ymm8, %ymm0, %ymm8
 	vaesenc	%ymm0, %ymm6, %ymm0
 	vaesenc	%ymm6, %ymm5, %ymm6
 	vaesenc	%ymm5, %ymm4, %ymm5
 	vaesenc	%ymm12, %ymm1, %ymm4
 	vpxor	glob_data + 0(%rip), %ymm0, %ymm0
-	vpxor	glob_data + 0(%rip), %ymm7, %ymm1
+	vpxor	glob_data + 0(%rip), %ymm2, %ymm1
 	vpxor	%ymm3, %ymm4, %ymm12
 	vaesenc	%ymm1, %ymm8, %ymm7
 	vaesenc	%ymm8, %ymm0, %ymm8
@@ -207,14 +1055,14 @@ _aegis256x2_decrypt:
 	.p2align	5
 .L_aegis256x2_decrypt$17:
 	vmovdqu	(%r8,%r9), %ymm1
-	vmovdqu	%ymm7, %ymm11
+	vmovdqu	%ymm7, %ymm2
 	vpxor	%ymm1, %ymm4, %ymm12
-	vaesenc	%ymm11, %ymm8, %ymm7
+	vaesenc	%ymm2, %ymm8, %ymm7
 	vaesenc	%ymm8, %ymm0, %ymm8
 	vaesenc	%ymm0, %ymm6, %ymm0
 	vaesenc	%ymm6, %ymm5, %ymm6
 	vaesenc	%ymm5, %ymm4, %ymm5
-	vaesenc	%ymm12, %ymm11, %ymm4
+	vaesenc	%ymm12, %ymm2, %ymm4
 	addq	$32, %r9
 .L_aegis256x2_decrypt$16:
 	cmpq	%rdi, %r9
@@ -236,14 +1084,14 @@ _aegis256x2_decrypt:
 	cmpq	%rdi, %r9
 	jb  	.L_aegis256x2_decrypt$15
 	vmovdqu	(%rsp), %ymm1
-	vmovdqu	%ymm7, %ymm11
+	vmovdqu	%ymm7, %ymm2
 	vpxor	%ymm1, %ymm4, %ymm12
-	vaesenc	%ymm11, %ymm8, %ymm7
+	vaesenc	%ymm2, %ymm8, %ymm7
 	vaesenc	%ymm8, %ymm0, %ymm8
 	vaesenc	%ymm0, %ymm6, %ymm0
 	vaesenc	%ymm6, %ymm5, %ymm6
 	vaesenc	%ymm5, %ymm4, %ymm5
-	vaesenc	%ymm12, %ymm11, %ymm4
+	vaesenc	%ymm12, %ymm2, %ymm4
 .L_aegis256x2_decrypt$13:
 	movq	64(%rsp), %rdi
 	andq	$-64, %rdi
@@ -317,8 +1165,8 @@ _aegis256x2_decrypt:
 	xorl	%r9d, %r9d
 	jmp 	.L_aegis256x2_decrypt$8
 .L_aegis256x2_decrypt$9:
-	movb	(%rax,%r9), %r10b
-	movb	%r10b, (%rsp,%r9)
+	movb	(%rax,%r9), %r8b
+	movb	%r8b, (%rsp,%r9)
 	incq	%r9
 .L_aegis256x2_decrypt$8:
 	cmpq	%rdi, %r9
@@ -352,8 +1200,8 @@ _aegis256x2_decrypt:
 	xorl	%r9d, %r9d
 	jmp 	.L_aegis256x2_decrypt$4
 .L_aegis256x2_decrypt$5:
-	movb	(%rsp,%r9), %r10b
-	movb	%r10b, (%rsi,%r9)
+	movb	(%rsp,%r9), %r8b
+	movb	%r8b, (%rsi,%r9)
 	incq	%r9
 .L_aegis256x2_decrypt$4:
 	cmpq	%rdi, %r9
@@ -426,13 +1274,13 @@ _aegis256x2_decrypt:
 	vextracti128	$1, %ymm2, %xmm1
 	vextracti128	$1, %ymm0, %xmm3
 	vpxor	%xmm2, %xmm1, %xmm1
-	vpxor	%xmm0, %xmm3, %xmm3
-	vmovdqu	(%rcx), %xmm0
-	vmovdqu	16(%rcx), %xmm2
-	vpcmpeqq	%xmm1, %xmm0, %xmm0
-	vpcmpeqq	%xmm3, %xmm2, %xmm2
-	vpand	%xmm2, %xmm0, %xmm0
-	vpmovmskb	%xmm0, %eax
+	vpxor	%xmm0, %xmm3, %xmm0
+	vmovdqu	(%rcx), %xmm2
+	vmovdqu	16(%rcx), %xmm3
+	vpcmpeqq	%xmm1, %xmm2, %xmm2
+	vpcmpeqq	%xmm0, %xmm3, %xmm3
+	vpand	%xmm3, %xmm2, %xmm2
+	vpmovmskb	%xmm2, %eax
 	incq	%rax
 	shrq	$16, %rax
 	decq	%rax
@@ -442,12 +1290,12 @@ _aegis256x2_decrypt:
 	vpxor	%ymm6, %ymm2, %ymm2
 	vpxor	%ymm0, %ymm2, %ymm2
 	vpxor	%ymm8, %ymm2, %ymm2
-	vpxor	%ymm1, %ymm2, %ymm2
-	vextracti128	$1, %ymm2, %xmm0
-	vpxor	%xmm2, %xmm0, %xmm0
+	vpxor	%ymm1, %ymm2, %ymm1
+	vextracti128	$1, %ymm1, %xmm0
+	vpxor	%xmm1, %xmm0, %xmm0
 	vmovdqu	(%rcx), %xmm1
-	vpcmpeqq	%xmm0, %xmm1, %xmm1
-	vpmovmskb	%xmm1, %eax
+	vpcmpeqq	%xmm0, %xmm1, %xmm0
+	vpmovmskb	%xmm0, %eax
 	incq	%rax
 	shrq	$16, %rax
 	decq	%rax
@@ -478,8 +1326,8 @@ _aegis256x2_encrypt:
 // declassify_val u8 %dl
 	movq	32(%rdi), %rsi
 // declassify_val u64 %rsi
-	movq	40(%rdi), %r9
-	movq	%r9, 32(%rsp)
+	movq	40(%rdi), %r8
+	movq	%r8, 32(%rsp)
 // declassify_val u64 32(%rsp)
 	movq	48(%rdi), %r8
 // declassify_val u64 %r8
@@ -780,33 +1628,33 @@ _aegis256x2_encrypt:
 	xorl	%r9d, %r9d
 	jmp 	.L_aegis256x2_encrypt$6
 .L_aegis256x2_encrypt$7:
-	movb	(%rsi,%r9), %r10b
-	movb	%r10b, (%rsp,%r9)
+	movb	(%rsi,%r9), %r8b
+	movb	%r8b, (%rsp,%r9)
 	incq	%r9
 .L_aegis256x2_encrypt$6:
 	cmpq	%rdi, %r9
 	jb  	.L_aegis256x2_encrypt$7
-	vmovdqu	(%rsp), %ymm2
-	vpxor	%ymm8, %ymm5, %ymm3
-	vpand	%ymm0, %ymm6, %ymm7
-	vmovdqu	%ymm1, %ymm11
-	vpxor	%ymm7, %ymm3, %ymm1
-	vpxor	%ymm11, %ymm1, %ymm1
-	vpxor	%ymm1, %ymm2, %ymm3
+	vmovdqu	(%rsp), %ymm12
+	vpxor	%ymm8, %ymm5, %ymm2
+	vpand	%ymm0, %ymm6, %ymm3
+	vmovdqu	%ymm1, %ymm7
+	vpxor	%ymm3, %ymm2, %ymm1
+	vpxor	%ymm7, %ymm1, %ymm1
+	vpxor	%ymm1, %ymm12, %ymm3
 // declassify_val u256 %ymm3
-	vpxor	%ymm2, %ymm4, %ymm12
-	vaesenc	%ymm11, %ymm8, %ymm1
+	vpxor	%ymm12, %ymm4, %ymm12
+	vaesenc	%ymm7, %ymm8, %ymm1
 	vaesenc	%ymm8, %ymm0, %ymm8
 	vaesenc	%ymm0, %ymm6, %ymm0
 	vaesenc	%ymm6, %ymm5, %ymm6
 	vaesenc	%ymm5, %ymm4, %ymm5
-	vaesenc	%ymm12, %ymm11, %ymm4
+	vaesenc	%ymm12, %ymm7, %ymm4
 	vmovdqu	%ymm3, (%rsp)
 	xorl	%r9d, %r9d
 	jmp 	.L_aegis256x2_encrypt$4
 .L_aegis256x2_encrypt$5:
-	movb	(%rsp,%r9), %r10b
-	movb	%r10b, (%rax,%r9)
+	movb	(%rsp,%r9), %sil
+	movb	%sil, (%rax,%r9)
 	incq	%r9
 .L_aegis256x2_encrypt$4:
 	cmpq	%rdi, %r9
@@ -881,18 +1729,18 @@ _aegis256x2_encrypt:
 	vextracti128	$1, %ymm2, %xmm1
 	vextracti128	$1, %ymm0, %xmm3
 	vpxor	%xmm2, %xmm1, %xmm1
-	vpxor	%xmm0, %xmm3, %xmm3
+	vpxor	%xmm0, %xmm3, %xmm0
 	vmovdqu	%xmm1, (%rcx)
-	vmovdqu	%xmm3, 16(%rcx)
+	vmovdqu	%xmm0, 16(%rcx)
 	jmp 	.L_aegis256x2_encrypt$2
 .L_aegis256x2_encrypt$1:
 	vpxor	%ymm5, %ymm4, %ymm2
 	vpxor	%ymm6, %ymm2, %ymm2
 	vpxor	%ymm0, %ymm2, %ymm2
 	vpxor	%ymm8, %ymm2, %ymm2
-	vpxor	%ymm1, %ymm2, %ymm2
-	vextracti128	$1, %ymm2, %xmm0
-	vpxor	%xmm2, %xmm0, %xmm0
+	vpxor	%ymm1, %ymm2, %ymm1
+	vextracti128	$1, %ymm1, %xmm0
+	vpxor	%xmm1, %xmm0, %xmm0
 	vmovdqu	%xmm0, (%rcx)
 .L_aegis256x2_encrypt$2:
 	movq	%rdi, %rax
