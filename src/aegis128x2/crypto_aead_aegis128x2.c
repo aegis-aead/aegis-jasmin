@@ -33,6 +33,12 @@ crypto_aead_aegis128x2_encrypt_detached(unsigned char       *c,
                                         const unsigned char *k)
 {
     const Params params = { c, mlen, mac, 16, (unsigned char *) m, mlen, ad, adlen, k, npub };
+
+    (void) nsec;
+
+    if (maclen_p != NULL) {
+        *maclen_p = 16;
+    }
     return _aegis128x2_encrypt(&params);
 }
 
@@ -50,6 +56,9 @@ crypto_aead_aegis128x2_decrypt_detached(unsigned char       *m,
     const Params params = {
         (unsigned char *) c, clen, (unsigned char *) mac, 16, m, clen, ad, adlen, k, npub
     };
+
+    (void) nsec;
+
     return _aegis128x2_decrypt(&params);
 }
 
