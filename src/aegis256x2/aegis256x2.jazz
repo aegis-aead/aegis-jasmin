@@ -2,32 +2,114 @@
 inline fn update(reg u256[6] st, reg u256 m)
      -> reg u256[6]
 {
-    reg u256 st5 t;
-    st5 = st[5];
-    t = st[0] ^ m;
-    st[5] = #VAESENC_256(st[4], st5);
+    reg u256 t;
+    t = #VAESENC_256(st[5], m);
+    st[5] = #VAESENC_256(st[4], st[5]);
     st[4] = #VAESENC_256(st[3], st[4]);
     st[3] = #VAESENC_256(st[2], st[3]);
     st[2] = #VAESENC_256(st[1], st[2]);
     st[1] = #VAESENC_256(st[0], st[1]);
-    st[0] = #VAESENC_256(st5, t);
+    st[0] ^= t;
 
     return st;
 }
 
-#[ct = "secret × secret × secret -> secret"]
-inline fn update2(reg u256[6] st, reg u256 m, reg u256 st5)
-     -> reg u256[6]
-{
-    reg u256 t = st[0] ^ m;
-    st[5] = #VAESENC_256(st[4], st5);
-    st[4] = #VAESENC_256(st[3], st[4]);
-    st[3] = #VAESENC_256(st[2], st[3]);
-    st[2] = #VAESENC_256(st[1], st[2]);
-    st[1] = #VAESENC_256(st[0], st[1]);
-    st[0] = #VAESENC_256(st5, t);
 
-    return st;
+#[ct = "public × public -> secret"]
+inline fn load_partial(reg u64 p, reg u64 len)
+    -> stack u256[1]
+{
+    stack u256[1] pad;
+    reg u256 zero = #set0_256();
+    pad[0] = zero;
+    reg u64 i b;
+    ?{}, i = #set0();
+    b = len;
+    b &= 16;
+    if (b != 0) {
+        reg u128 x16;
+        x16 = [:u128 p + i];
+        pad.[:u128 i] = x16;
+        i += 16;
+    }
+    b = len;
+    b &= 8;
+    if (b != 0) {
+        reg u64 x8;
+        x8 = [:u64 p + i];
+        pad.[:u64 i] = x8;
+        i += 8;
+    }
+    b = len;
+    b &= 4;
+    if (b != 0) {
+        reg u32 x4;
+        x4 = [:u32 p + i];
+        pad.[:u32 i] = x4;
+        i += 4;
+    }
+    b = len;
+    b &= 2;
+    if (b != 0) {
+        reg u16 x2;
+        x2 = [:u16 p + i];
+        pad.[:u16 i] = x2;
+        i += 2;
+    }
+    b = len;
+    b &= 1;
+    if (b != 0) {
+        reg u8 x1;
+        x1 = [:u8 p + i];
+        pad.[:u8 i] = x1;
+    }
+
+    return pad;
+}
+
+inline fn store_partial(reg u64 p, reg u64 len, stack u256[1] pad)
+{
+    reg u64 i b;
+    ?{}, i = #set0();
+    b = len;
+    b &= 16;
+    if (b != 0) {
+        reg u128 x16;
+        x16 = pad.[:u128 i];
+        [:u128 p + i] = x16;
+        i += 16;
+    }
+    b = len;
+    b &= 8;
+    if (b != 0) {
+        reg u64 x8;
+        x8 = pad.[:u64 i];
+        [:u64 p + i] = x8;
+        i += 8;
+    }
+    b = len;
+    b &= 4;
+    if (b != 0) {
+        reg u32 x4;
+        x4 = pad.[:u32 i];
+        [:u32 p + i] = x4;
+        i += 4;
+    }
+    b = len;
+    b &= 2;
+    if (b != 0) {
+        reg u16 x2;
+        x2 = pad.[:u16 i];
+        [:u16 p + i] = x2;
+        i += 2;
+    }
+    b = len;
+    b &= 1;
+    if (b != 0) {
+        reg u8 x1;
+        x1 = pad.[:u8 i];
+        [:u8 p + i] = x1;
+    }
 }
 
 #[ct = "secret × secret -> secret"]
@@ -43,15 +125,14 @@ inline fn absorb(reg u256[6] st, reg u256 t)
 inline fn enc(reg u256[6] st, reg u256 t)
     -> reg u256[6], reg u256
 {
-    reg u256 out mask z st5;
+    reg u256 out mask z;
     z = st[1] ^ st[4];
     mask = st[2] & st[3];
-    st5 = st[5];
     z ^= mask;
-    z ^= st5;
+    z ^= st[5];
     out = t ^ z;
     #declassify(out);
-    st = update2(st, t, st5);
+    st = update(st, t);
 
     return st, out;
 }
@@ -60,14 +141,20 @@ inline fn enc(reg u256[6] st, reg u256 t)
 inline fn dec(reg u256[6] st, reg u256 t)
     -> reg u256[6], reg u256
 {
-    reg u256 out mask z st5;
-    z = st[1] ^ st[4];
+    reg u256 out mask z x;
+    x = #VAESENC_256(st[5], t);
+    z = st[4] ^ st[5];
     mask = st[2] & st[3];
-    st5 = st[5];
+    z ^= st[1];
+    x ^= st[0];
     z ^= mask;
-    z ^= st5;
+    st[5] = #VAESENC_256(st[4], st[5]);
+    st[4] = #VAESENC_256(st[3], st[4]);
+    st[3] = #VAESENC_256(st[2], st[3]);
+    st[2] = #VAESENC_256(st[1], st[2]);
+    st[1] = #VAESENC_256(st[0], st[1]);
+    st[0] = x ^ z;
     out = t ^ z;
-    st = update2(st, out, st5);
 
     return st, out;
 }
@@ -77,22 +164,22 @@ inline fn declast(reg u256[6] st, reg u256 t,
                   reg u64 left)
     -> reg u256[6], reg u256
 {
-    reg u256 out mask z st5;
+    reg u256 out mask z;
     z = st[1] ^ st[4];
     mask = st[2] & st[3];
-    st5 = st[5];
     z ^= mask;
-    z ^= st5;
+    z ^= st[5];
     out = t ^ z;
 
-    stack u256[1] pad;
-    pad[0] = out;
-    reg u64 i = left;
-    while (i < 32) {
-        pad[:u8 i] = 0;
-        i += 1;
-    }
-    st = update2(st, pad[0], st5);
+    global u256 iota0;
+    iota0 = (32u8)[31, 30, 29, 28, 27, 26, 25, 24, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0];
+    reg u128 lx;
+    lx = #VMOV_64(left);
+    reg u256 l m;
+    l = #VPBROADCAST_32u8(lx);
+    m = #VPCMPGT_32u8(l, iota0);
+    m &= out;
+    st = update(st, m);
 
     return st, out;
 }
@@ -287,14 +374,7 @@ export fn _aegis256x2_encrypt(reg u64 params)
         ad_p += i;
 
         stack u256[1] pad;
-        reg u256 zero = #set0_256();
-        pad[0] = zero;
-
-        ?{}, i = #set0();
-        while (i < left) {
-            pad[:u8 i] = [:u8 ad_p + i];
-            i += 1;
-        }
+        pad = load_partial(ad_p, left);
         st = absorb(st, pad[0]);
     }
 
@@ -321,22 +401,11 @@ export fn _aegis256x2_encrypt(reg u64 params)
         ct_p += i;
 
         stack u256[1] pad;
-        reg u256 zero = #set0_256();
-        pad[0] = zero;
-
-        ?{}, i = #set0();
-        while (i < left) {
-            pad[:u8 i] = [:u8 msg_p + i];
-            i += 1;
-        }
+        pad = load_partial(msg_p, left);
 
         st, pad[0] = enc(st, pad[0]);
 
-        ?{}, i = #set0();
-        while (i < left) {
-            [:u8 ct_p + i] = pad[:u8 i];
-            i += 1;
-        }
+        store_partial(ct_p, left, pad);
     }
 
     // finalize
@@ -397,14 +466,7 @@ export fn _aegis256x2_decrypt(reg u64 params)
         ad_p += i;
 
         stack u256[1] pad;
-        reg u256 zero = #set0_256();
-        pad[0] = zero;
-
-        ?{}, i = #set0();
-        while (i < left) {
-            pad[:u8 i] = [:u8 ad_p + i];
-            i += 1;
-        }
+        pad = load_partial(ad_p, left);
 
         st = absorb(st, pad[0]);
     }
@@ -427,7 +489,7 @@ export fn _aegis256x2_decrypt(reg u64 params)
     }
     left = ct_len_;
     left -= i;
-    if (left > 32) {
+    if (left >= 32) {
         #[public] reg u256 t;
         t = [:u256 ct_p + i];
         #declassify(t);
@@ -440,14 +502,7 @@ export fn _aegis256x2_decrypt(reg u64 params)
         ct_p += i;
 
         #[flexible] stack u256[1] pad;
-        reg u256 zero = #set0_256();
-        pad[0] = zero;
-
-        ?{}, i = #set0();
-        while (i < left) {
-            pad[:u8 i] = [:u8 ct_p + i];
-            i += 1;
-        }
+        pad = load_partial(ct_p, left);
 
         #[public] reg u256 t;
         t = pad[0];
@@ -455,11 +510,7 @@ export fn _aegis256x2_decrypt(reg u64 params)
 
         st, pad[0] = declast(st, t, left);
 
-        ?{}, i = #set0();
-        while (i < left) {
-            [:u8 msg_p + i] = pad[:u8 i];
-            i += 1;
-        }
+        store_partial(msg_p, left, pad);
     }
 
     // finalize
@@ -632,14 +683,7 @@ inline fn mac(reg u64 params, inline bool verify)
         data_p += i;
 
         stack u256[1] pad;
-        reg u256 zero = #set0_256();
-        pad[0] = zero;
-
-        ?{}, i = #set0();
-        while (i < left) {
-            pad[:u8 i] = [:u8 data_p + i];
-            i += 1;
-        }
+        pad = load_partial(data_p, left);
         st = absorb(st, pad[0]);
     }
 
